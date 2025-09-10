@@ -23,7 +23,7 @@ public class MenuController {
         return ResponseEntity.ok(itemService.findAll());
     }
 
-    @PostMapping
+    @PostMapping("/add-items")
     public ResponseEntity<?> addMenu(@RequestBody Menu menu) {
         return ResponseEntity.ok("Items");
     }

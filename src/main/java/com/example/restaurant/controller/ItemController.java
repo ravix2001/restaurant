@@ -2,11 +2,9 @@ package com.example.restaurant.controller;
 
 import com.example.restaurant.entity.Item;
 import com.example.restaurant.service.ItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,14 +27,43 @@ public class ItemController {
     public ResponseEntity<?> getItemById(@PathVariable Long id) {
         Optional<Item> item = itemService.findById(id);
 //        return product.map(value -> ResponseEntity.ok(itemService.getProductResponse(value))).orElseGet(() -> ResponseEntity.notFound().build());
-        return ResponseEntity.ok(item);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<?> getItemByName(@PathVariable String name) {
-        Optional<Item> item = itemService.findByName(name);
-//        return product.map(value -> ResponseEntity.ok(itemService.getProductResponse(value))).orElseGet(() -> ResponseEntity.notFound().build());
-        return ResponseEntity.ok(item);
+//    @GetMapping("/{name}")
+//    public ResponseEntity<?> getItemByName(@PathVariable String name) {
+//        Optional<Item> item = itemService.findByName(name);
+////        return product.map(value -> ResponseEntity.ok(itemService.getProductResponse(value))).orElseGet(() -> ResponseEntity.notFound().build());
+//        return ResponseEntity.ok(item);
+//    }
+
+    @PostMapping
+    public ResponseEntity<?> addItem(@RequestBody Item item) {
+        try{
+            itemService.createItem(item);
+            return new ResponseEntity<>(item, HttpStatus.CREATED);      // paxi uri location haalxu
+        }catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>("Invalid input provided", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            return new ResponseEntity<>("An error occurred while updating the item", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody Item item) {
+        try {
+            Optional<Item> existingItem = itemService.findById(id);
+            if (existingItem.isPresent()) {
+                itemService.updateItem(id, item);
+                return ResponseEntity.ok(item);
+            } else {
+                return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>("Invalid input provided", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred while updating the item", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

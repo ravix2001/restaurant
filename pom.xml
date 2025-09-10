@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
+<!--			<scope>runtime</scope>	// dont define scope -> postgresql is required in both compile-time & run-time -->
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
