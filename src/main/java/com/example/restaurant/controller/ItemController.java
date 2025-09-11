@@ -1,5 +1,6 @@
 package com.example.restaurant.controller;
 
+import com.example.restaurant.dto.ItemDto;
 import com.example.restaurant.entity.Item;
 import com.example.restaurant.service.ItemService;
 import org.springframework.http.HttpStatus;
@@ -42,9 +43,9 @@ public class ItemController {
 //    }
 
     @PostMapping
-    public ResponseEntity<?> addItem(@RequestBody Item item) {
+    public ResponseEntity<?> addItem(@RequestBody ItemDto itemDto) {
         try{
-            itemService.createItem(item);
+            Item item = itemService.createItem(itemDto);
             return new ResponseEntity<>(item, HttpStatus.CREATED);      // paxi uri location haalxu
         }catch (IllegalArgumentException ex) {
             return new ResponseEntity<>("Invalid input provided", HttpStatus.BAD_REQUEST);
@@ -55,12 +56,12 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody Item item) {
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) {
         try {
             Optional<Item> existingItem = itemService.findById(id);
             if (existingItem.isPresent()) {
-                itemService.updateItem(id, item);
-                return ResponseEntity.ok(item);
+                Item updatedItem = itemService.updateItem(id, itemDto);
+                return new ResponseEntity<>(updatedItem, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
             }
