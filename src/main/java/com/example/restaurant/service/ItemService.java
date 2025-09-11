@@ -34,30 +34,32 @@ public class ItemService {
     }
 
     @Transactional
-    public void createItem(Item item) {
+    public Item createItem(ItemDto itemDto) {
         try {
             Item newItem = new Item();
-            newItem.setName(item.getName());
-            newItem.setDescription(item.getDescription());
-            newItem.setQuantity(item.getQuantity());
-            newItem.setPrice(item.getPrice());
-            itemRepository.save(item);
+            newItem.setName(itemDto.getName());
+            newItem.setDescription(itemDto.getDescription());
+            newItem.setQuantity(itemDto.getQuantity());
+            newItem.setPrice(itemDto.getPrice());
+            Item item = itemRepository.save(newItem);
+            return item;
         }catch(Exception e){
             System.out.println(e.getMessage());
-            throw new RuntimeException("Error while creating an item");
+            throw new RuntimeException("Error while creating an itemDto");
         }
     }
 
     @Transactional
-    public void updateItem(Long id, Item newItem) {
+    public Item updateItem(Long id, ItemDto itemDto) {
         try {
             Optional<Item> item = itemRepository.findById(id);
             if (item.isPresent()) {
-                item.get().setName(newItem.getName());
-                item.get().setDescription(newItem.getDescription());
-                item.get().setQuantity(newItem.getQuantity());
-                item.get().setPrice(newItem.getPrice());
-                itemRepository.save(item.get());
+                item.get().setName(itemDto.getName());
+                item.get().setDescription(itemDto.getDescription());
+                item.get().setQuantity(itemDto.getQuantity());
+                item.get().setPrice(itemDto.getPrice());
+                Item updatedItem = itemRepository.save(item.get());
+                return updatedItem;
             } else {
                 throw new RuntimeException("Item not found");
             }
