@@ -19,6 +19,9 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+    /**
+     * This getALl items is already fetched using /api/menu in MenuController
+     */
     @GetMapping
     public ResponseEntity<List<Item>> getItems() {
         return ResponseEntity.ok(itemService.findAll());
@@ -34,13 +37,6 @@ public class ItemController {
             return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
         }
     }
-
-//    @GetMapping("/{name}")
-//    public ResponseEntity<?> getItemByName(@PathVariable String name) {
-//        Optional<Item> item = itemService.findByName(name);
-////        return product.map(value -> ResponseEntity.ok(itemService.getProductResponse(value))).orElseGet(() -> ResponseEntity.notFound().build());
-//        return ResponseEntity.ok(item);
-//    }
 
     @PostMapping
     public ResponseEntity<?> addItem(@RequestBody ItemDto itemDto) {

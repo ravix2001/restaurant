@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/menu")
@@ -23,9 +21,8 @@ public class MenuController {
         return ResponseEntity.ok(itemService.findAll());
     }
 
-    @PostMapping("/add-items")
-    public ResponseEntity<?> addMenu(@RequestBody Menu menu) {
-        return ResponseEntity.ok("Items");
-    }
+    /**
+     * We can later add the controllers of item in this menu section according to requirements
+     */
 
 }
