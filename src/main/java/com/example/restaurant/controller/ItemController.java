@@ -27,7 +27,11 @@ public class ItemController {
     public ResponseEntity<?> getItemById(@PathVariable Long id) {
         Optional<Item> item = itemService.findById(id);
 //        return product.map(value -> ResponseEntity.ok(itemService.getProductResponse(value))).orElseGet(() -> ResponseEntity.notFound().build());
-        return new ResponseEntity<>(item, HttpStatus.OK);
+        if(item.isPresent()){
+            return new ResponseEntity<>(item, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+        }
     }
 
 //    @GetMapping("/{name}")
@@ -66,4 +70,14 @@ public class ItemController {
             return new ResponseEntity<>("An error occurred while updating the item", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteItem(@PathVariable Long id) {
+        boolean isDeleted = itemService.deleteById(id);
+        if (isDeleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
+    }
+
 }
