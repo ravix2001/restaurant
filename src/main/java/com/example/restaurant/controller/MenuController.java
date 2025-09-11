@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/menu")
@@ -22,5 +20,9 @@ public class MenuController {
     public ResponseEntity<List<Item>> getMenu() {
         return ResponseEntity.ok(itemService.findAll());
     }
+
+    /**
+     * We can later add the controllers of item in this menu section according to requirements
+     */
 
 }
