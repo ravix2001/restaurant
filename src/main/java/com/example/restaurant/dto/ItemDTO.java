@@ -7,16 +7,11 @@ import java.util.List;
 
 @Data
 public class ItemDTO {
-    private Long itemId;
+    private Long id;
     private String name;
     private String description;
-    private BigDecimal price;
+    private BigDecimal basePrice;
     private Long categoryId;
-    private Long menuId;
-
-    private List<Long> ingredientIds;
-    private List<Long> modifierIds;
-    private List<Long> allergenIds;
-    private List<Long> priceIds;
+    private List<ItemSizeDTO> sizes; // embed sizes for quick read
 
 }

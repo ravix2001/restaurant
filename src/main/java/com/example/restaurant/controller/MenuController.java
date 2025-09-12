@@ -1,7 +1,6 @@
 package com.example.restaurant.controller;
 
 import com.example.restaurant.entity.Item;
-import com.example.restaurant.entity.Menu;
 import com.example.restaurant.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

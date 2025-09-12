@@ -3,32 +3,28 @@ package com.example.restaurant.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
-@Table(name = "item")
-public class Item {
+@Table(name = "size_group")
+public class SizeGroup {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 120)
     private String name;
 
     @Column(columnDefinition = "text")
     private String description;
 
-    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal basePrice;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemSize> itemSizes = new ArrayList<>();
+    @OneToMany(mappedBy = "sizeGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Size> sizes = new ArrayList<>();
 
 //    // getters & setters
 //    public Long getId() { return id; }
@@ -37,10 +33,8 @@ public class Item {
 //    public void setName(String name) { this.name = name; }
 //    public String getDescription() { return description; }
 //    public void setDescription(String description) { this.description = description; }
-//    public BigDecimal getBasePrice() { return basePrice; }
-//    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
 //    public Category getCategory() { return category; }
 //    public void setCategory(Category category) { this.category = category; }
-//    public List<ItemSize> getItemSizes() { return itemSizes; }
-//    public void setItemSizes(List<ItemSize> itemSizes) { this.itemSizes = itemSizes; }
+//    public List<Size> getSizes() { return sizes; }
+//    public void setSizes(List<Size> sizes) { this.sizes = sizes; }
 }
