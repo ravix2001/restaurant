@@ -2,13 +2,13 @@ package com.example.restaurant.dto;
 
 import lombok.Data;
 
-@Data
-public class ItemDto {
+import java.util.List;
 
-    private Long id;
+@Data
+public class CategoryDTO {
+    private Long categoryId;
     private String name;
     private String description;
-    private int quantity;
-    private Double price;
+    private List<Long> itemIds;
 
 }

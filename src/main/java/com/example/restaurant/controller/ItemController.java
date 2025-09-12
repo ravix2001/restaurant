@@ -1,6 +1,6 @@
 package com.example.restaurant.controller;
 
-import com.example.restaurant.dto.ItemDto;
+import com.example.restaurant.dto.ItemDTO;
 import com.example.restaurant.entity.Item;
 import com.example.restaurant.service.ItemService;
 import org.springframework.http.HttpStatus;
@@ -39,7 +39,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addItem(@RequestBody ItemDto itemDto) {
+    public ResponseEntity<?> addItem(@RequestBody ItemDTO itemDto) {
         try{
             Item item = itemService.createItem(itemDto);
             return new ResponseEntity<>(item, HttpStatus.CREATED);      // paxi uri location haalxu
@@ -52,7 +52,7 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDto itemDto) {
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDto) {
         try {
             Optional<Item> existingItem = itemService.findById(id);
             if (existingItem.isPresent()) {
