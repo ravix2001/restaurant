@@ -1,7 +1,7 @@
 package com.example.restaurant.repository;
 
-import com.example.restaurant.entity.Menu;
+import com.example.restaurant.entity.Allergen;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MenuRepository extends JpaRepository<Menu, Long> {
+public interface AllergenRepository extends JpaRepository<Allergen, Long> {
 }

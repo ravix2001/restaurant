@@ -1,4 +1,7 @@
 package com.example.restaurant.repository;
 
-public interface MenuRepository {
+import com.example.restaurant.entity.Menu;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MenuRepository extends JpaRepository<Menu, Long> {
 }
