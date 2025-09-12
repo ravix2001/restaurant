@@ -1,6 +1,6 @@
 package com.example.restaurant.service;
 
-import com.example.restaurant.dto.ItemDto;
+import com.example.restaurant.dto.ItemDTO;
 import com.example.restaurant.entity.Item;
 import com.example.restaurant.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +33,20 @@ public class ItemService {
         itemRepository.save(item);
     }
 
+
+//            item.setName(updatedItem.getName());
+//            item.setDescription(updatedItem.getDescription());
+//            item.setPrice(updatedItem.getPrice());
+//            item.setCategory(updatedItem.getCategory());
+//            item.setMenu(updatedItem.getMenu());
+//            return itemRepository.save(item);
+
     @Transactional
-    public Item createItem(ItemDto itemDto) {
+    public Item createItem(ItemDTO itemDto) {
         try {
             Item newItem = new Item();
             newItem.setName(itemDto.getName());
             newItem.setDescription(itemDto.getDescription());
-            newItem.setQuantity(itemDto.getQuantity());
             newItem.setPrice(itemDto.getPrice());
             Item item = itemRepository.save(newItem);
             return item;
@@ -50,7 +57,7 @@ public class ItemService {
     }
 
     @Transactional
-    public Item updateItem(Long id, ItemDto itemDto) {
+    public Item updateItem(Long id, ItemDTO itemDto) {
         try {
             Optional<Item> item = itemRepository.findById(id);
             if (item.isPresent()) {
