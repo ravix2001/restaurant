@@ -5,10 +5,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CategoryDTO {
+public class SizeGroupDTO {
     private Long id;
     private String name;
     private String description;
-    private List<Long> sizeGroupIds;
-
+    private Long categoryId;
+    private List<Long> sizeIds;
 }

@@ -1,7 +1,5 @@
 package com.example.restaurant.mapper;
 
-import com.example.restaurant.dto.AllergenDTO;
-import com.example.restaurant.entity.Allergen;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
