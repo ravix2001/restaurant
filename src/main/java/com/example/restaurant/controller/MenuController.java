@@ -1,27 +1,33 @@
 package com.example.restaurant.controller;
 
-import com.example.restaurant.entity.Item;
-import com.example.restaurant.service.ItemService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.restaurant.dto.MenuDTO;
+import com.example.restaurant.entity.MenuDB;
+import com.example.restaurant.service.MenuService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/menu")
+@RequestMapping("/api/items")
 public class MenuController {
 
-    @Autowired
-    private ItemService itemService;
+    private final MenuService menuService;
+
+    public MenuController(MenuService menuService) { this.menuService = menuService; }
+
+    @PostMapping
+    public ResponseEntity<MenuDB> create(@RequestBody MenuDTO menuDTO) { return ResponseEntity.ok(menuService.create(menuDTO)); }
 
     @GetMapping
-    public ResponseEntity<List<Item>> getMenu() {
-        return ResponseEntity.ok(itemService.findAll());
-    }
+    public List<MenuDB> list() { return menuService.getAll(); }
 
-    /**
-     * We can later add the controllers of item in this menu section according to requirements
-     */
+    @GetMapping("/{id}")
+    public ResponseEntity<MenuDB> get(@PathVariable Long id) { return ResponseEntity.ok(menuService.getById(id)); }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<MenuDB> update(@PathVariable Long id, @RequestBody MenuDTO menuDTO) { return ResponseEntity.ok(menuService.update(id, menuDTO)); }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) { menuService.delete(id); return ResponseEntity.noContent().build(); }
 }

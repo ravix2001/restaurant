@@ -1,17 +1,18 @@
 package com.example.restaurant.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-@Data
-public class ItemDTO {
+@Getter
+@Setter
+public class MenuDTO {
+
     private Long id;
     private String name;
     private String description;
     private BigDecimal basePrice;
     private Long categoryId;
-    private List<ItemSizeDTO> sizes; // embed sizes for quick read
 
 }
