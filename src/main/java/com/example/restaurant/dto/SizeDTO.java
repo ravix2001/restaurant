@@ -1,10 +1,14 @@
 package com.example.restaurant.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class SizeDTO {
+
     private Long id;
     private String name;
     private Long sizeGroupId;
+
 }
