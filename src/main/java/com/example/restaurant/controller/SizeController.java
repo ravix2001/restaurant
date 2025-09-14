@@ -1,6 +1,7 @@
 package com.example.restaurant.controller;
 
 import com.example.restaurant.dto.SizeDTO;
+import com.example.restaurant.entity.SizeDB;
 import com.example.restaurant.service.SizeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,21 +14,21 @@ public class SizeController {
 
     private final SizeService sizeService;
 
-    public SizeController(SizeService svc) { this.sizeService = svc; }
+    public SizeController(SizeService sizeService) { this.sizeService = sizeService; }
 
-    @PostMapping("/groups/{groupId}")
-    public ResponseEntity<SizeDTO> create(@PathVariable Long groupId, @RequestBody SizeDTO dto) {
-        return ResponseEntity.ok(sizeService.create(groupId, dto));
+    @PostMapping("/size-group/{groupId}")
+    public ResponseEntity<SizeDB> create(@PathVariable Long groupId, @RequestBody SizeDTO sizeDTO) {
+        return ResponseEntity.ok(sizeService.create(groupId, sizeDTO));
     }
 
-    @GetMapping("/groups/{groupId}")
-    public List<SizeDTO> listByGroup(@PathVariable Long groupId) { return sizeService.findBySizeGroup(groupId); }
+    @GetMapping("/size-group/{groupId}")
+    public List<SizeDB> listByGroup(@PathVariable Long groupId) { return sizeService.findBySizeGroup(groupId); }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SizeDTO> get(@PathVariable Long id) { return ResponseEntity.ok(sizeService.getById(id)); }
+    public ResponseEntity<SizeDB> get(@PathVariable Long id) { return ResponseEntity.ok(sizeService.getById(id)); }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SizeDTO> update(@PathVariable Long id, @RequestBody SizeDTO dto) { return ResponseEntity.ok(sizeService.update(id, dto)); }
+    public ResponseEntity<SizeDB> update(@PathVariable Long id, @RequestBody SizeDTO sizeDTO) { return ResponseEntity.ok(sizeService.update(id, sizeDTO)); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) { sizeService.delete(id); return ResponseEntity.noContent().build(); }
