@@ -3,57 +3,54 @@ package com.example.restaurant.service.impl;
 import com.example.restaurant.dto.SizeGroupDTO;
 import com.example.restaurant.entity.CategoryDB;
 import com.example.restaurant.entity.SizeGroupDB;
-import com.example.restaurant.mapper.SizeGroupMapper;
 import com.example.restaurant.repository.CategoryRepository;
 import com.example.restaurant.repository.SizeGroupRepository;
 import com.example.restaurant.service.SizeGroupService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SizeGroupServiceImpl implements SizeGroupService {
 
-    private final SizeGroupRepository repo;
-    private final CategoryRepository categoryRepo;
-    private final SizeGroupMapper mapper;
+    private final SizeGroupRepository sizeGroupRepository;
+    private final CategoryRepository categoryRepository;
 
-    public SizeGroupServiceImpl(SizeGroupRepository repo, CategoryRepository categoryRepo, SizeGroupMapper mapper) {
-        this.repo = repo;
-        this.categoryRepo = categoryRepo;
-        this.mapper = mapper;
+    public SizeGroupServiceImpl(SizeGroupRepository sizeGroupRepository, CategoryRepository categoryRepository) {
+        this.sizeGroupRepository = sizeGroupRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
-    public SizeGroupDTO create(Long categoryId, SizeGroupDTO dto) {
-        CategoryDB category = categoryRepo.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
-        SizeGroupDB sg = mapper.toEntity(dto);
-        sg.setCategory(category);
-        SizeGroupDB saved = repo.save(sg);
-        return mapper.toDTO(saved);
+    public SizeGroupDB create(Long categoryId, SizeGroupDTO sizeGroupDTO) {
+        CategoryDB category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+        SizeGroupDB sizeGroupDB = new SizeGroupDB();
+        sizeGroupDB.setName(sizeGroupDTO.getName());
+        sizeGroupDB.setDescription(sizeGroupDTO.getDescription());
+        sizeGroupDB.setCategory(category);
+        return sizeGroupRepository.save(sizeGroupDB);
     }
 
     @Override
-    public SizeGroupDTO update(Long id, SizeGroupDTO dto) {
-        SizeGroupDB sg = repo.findById(id).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
-        sg.setName(dto.getName());
-        sg.setDescription(dto.getDescription());
-        return mapper.toDTO(repo.save(sg));
+    public SizeGroupDB update(Long id, SizeGroupDTO sizeGroupDTO) {
+        SizeGroupDB sizeGroupDB = sizeGroupRepository.findById(id).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
+        sizeGroupDB.setName(sizeGroupDTO.getName());
+        sizeGroupDB.setDescription(sizeGroupDTO.getDescription());
+        return sizeGroupRepository.save(sizeGroupDB);
     }
 
     @Override
     public void delete(Long id) {
-        repo.deleteById(id);
+        sizeGroupRepository.deleteById(id);
     }
 
     @Override
-    public List<SizeGroupDTO> findByCategory(Long categoryId) {
-        return repo.findByCategoryId(categoryId).stream().map(mapper::toDTO).collect(Collectors.toList());
+    public List<SizeGroupDB> findByCategoryId(Long categoryId) {
+        return sizeGroupRepository.findByCategoryId(categoryId);
     }
 
     @Override
-    public SizeGroupDTO getById(Long id) {
-        return repo.findById(id).map(mapper::toDTO).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
+    public SizeGroupDB getById(Long id) {
+        return sizeGroupRepository.findById(id).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
     }
 }

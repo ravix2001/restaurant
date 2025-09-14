@@ -3,56 +3,52 @@ package com.example.restaurant.service.impl;
 import com.example.restaurant.dto.SizeDTO;
 import com.example.restaurant.entity.SizeDB;
 import com.example.restaurant.entity.SizeGroupDB;
-import com.example.restaurant.mapper.SizeMapper;
 import com.example.restaurant.repository.SizeGroupRepository;
 import com.example.restaurant.repository.SizeRepository;
 import com.example.restaurant.service.SizeService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SizeServiceImpl implements SizeService {
 
-    private final SizeRepository repo;
-    private final SizeGroupRepository sizeGroupRepo;
-    private final SizeMapper mapper;
+    private final SizeRepository sizeRepository;
+    private final SizeGroupRepository sizeGroupRepository;
 
-    public SizeServiceImpl(SizeRepository repo, SizeGroupRepository sizeGroupRepo, SizeMapper mapper) {
-        this.repo = repo;
-        this.sizeGroupRepo = sizeGroupRepo;
-        this.mapper = mapper;
+    public SizeServiceImpl(SizeRepository sizeRepository, SizeGroupRepository sizeGroupRepository) {
+        this.sizeRepository = sizeRepository;
+        this.sizeGroupRepository = sizeGroupRepository;
     }
 
     @Override
-    public SizeDTO create(Long sizeGroupId, SizeDTO dto) {
-        SizeGroupDB sg = sizeGroupRepo.findById(sizeGroupId).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
-        SizeDB s = mapper.toEntity(dto);
-        s.setSizeGroupDB(sg);
-        SizeDB saved = repo.save(s);
-        return mapper.toDTO(saved);
+    public SizeDB create(Long sizeGroupId, SizeDTO sizeDTO) {
+        SizeGroupDB sizeGroupDB = sizeGroupRepository.findById(sizeGroupId).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
+        SizeDB sizeDB = new SizeDB();
+        sizeDB.setName(sizeDTO.getName());
+        sizeDB.setSizeGroupDB(sizeGroupDB);
+        return sizeRepository.save(sizeDB);
     }
 
     @Override
-    public SizeDTO update(Long id, SizeDTO dto) {
-        SizeDB s = repo.findById(id).orElseThrow(() -> new RuntimeException("Size not found"));
-        s.setName(dto.getName());
-        return mapper.toDTO(repo.save(s));
+    public SizeDB update(Long id, SizeDTO sizeDTO) {
+        SizeDB sizeDB = sizeRepository.findById(id).orElseThrow(() -> new RuntimeException("Size not found"));
+        sizeDB.setName(sizeDTO.getName());
+        return sizeRepository.save(sizeDB);
     }
 
     @Override
     public void delete(Long id) {
-        repo.deleteById(id);
+        sizeRepository.deleteById(id);
     }
 
     @Override
-    public List<SizeDTO> findBySizeGroup(Long sizeGroupId) {
-        return repo.findBySizeGroupId(sizeGroupId).stream().map(mapper::toDTO).collect(Collectors.toList());
+    public List<SizeDB> findBySizeGroup(Long sizeGroupId) {
+        return sizeRepository.findBySizeGroupId(sizeGroupId);
     }
 
     @Override
-    public SizeDTO getById(Long id) {
-        return repo.findById(id).map(mapper::toDTO).orElseThrow(() -> new RuntimeException("Size not found"));
+    public SizeDB getById(Long id) {
+        return sizeRepository.findById(id).orElseThrow(() -> new RuntimeException("Size not found"));
     }
 }
