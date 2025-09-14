@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "item_size", uniqueConstraints = @UniqueConstraint(columnNames = {"item_id", "size_id"}))
+@Table(name = "menu_size", uniqueConstraints = @UniqueConstraint(columnNames = {"menu_id", "size_id"}))
 public class MenuSizeDB {
 
     // price initialization
@@ -21,13 +21,21 @@ public class MenuSizeDB {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // new way
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
+    @JoinColumn(name = "menu_id", nullable = false, referencedColumnName = "id")
     private MenuDB menuDB;
 
+    @Column(name = "menu_id", insertable = false, updatable = false)
+    private Long menuId;
+
+    // new way
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "size_id", nullable = false)
+    @JoinColumn(name = "size_id", nullable = false, referencedColumnName = "id")
     private SizeDB sizeDB;
+
+    @Column(name = "size_id", insertable = false, updatable = false)
+    private Long sizeId;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
