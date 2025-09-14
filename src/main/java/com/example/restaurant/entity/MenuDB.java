@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "item")
+@Table(name = "menu")
 public class MenuDB {
 
     @Id
@@ -32,6 +32,6 @@ public class MenuDB {
     private CategoryDB category;
 
     @Column(name = "category_id", insertable = false, updatable = false)
-    private String categoryId;
+    private Long categoryId;
 
 }

@@ -22,7 +22,8 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public SizeDB create(Long sizeGroupId, SizeDTO sizeDTO) {
+    public SizeDB create(SizeDTO sizeDTO) {
+        Long sizeGroupId = sizeDTO.getSizeGroupId();
         SizeGroupDB sizeGroupDB = sizeGroupRepository.findById(sizeGroupId).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
         SizeDB sizeDB = new SizeDB();
         sizeDB.setName(sizeDTO.getName());

@@ -23,15 +23,15 @@ public class SizeGroupController {
         return ResponseEntity.ok(sizeGroupService.create(sizeGroupDTO));
     }
 
-    @GetMapping("/category/{categoryId}")
-    public List<SizeGroupDB> listByCategory(@PathVariable Long categoryId) {
-        return sizeGroupService.findByCategoryId(categoryId);
+    @GetMapping
+    public ResponseEntity<List<SizeGroupDB>> getAll() {
+        return ResponseEntity.ok(sizeGroupService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SizeGroupDB> get(@PathVariable Long id) { return ResponseEntity.ok(sizeGroupService.getById(id)); }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<SizeGroupDB> update(@RequestBody SizeGroupDTO sizeGroupDTO) { return ResponseEntity.ok(sizeGroupService.update(sizeGroupDTO)); }
 
     @DeleteMapping("/{id}")

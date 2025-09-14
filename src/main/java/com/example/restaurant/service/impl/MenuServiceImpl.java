@@ -1,11 +1,8 @@
 package com.example.restaurant.service.impl;
 
 import com.example.restaurant.dto.MenuDTO;
-import com.example.restaurant.dto.MenuSizeDTO;
 import com.example.restaurant.entity.CategoryDB;
 import com.example.restaurant.entity.MenuDB;
-import com.example.restaurant.entity.MenuSizeDB;
-import com.example.restaurant.entity.SizeDB;
 import com.example.restaurant.repository.CategoryRepository;
 import com.example.restaurant.repository.MenuRepository;
 import com.example.restaurant.repository.MenuSizeRepository;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MenuServiceImpl implements MenuService {

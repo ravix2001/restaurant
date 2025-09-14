@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class MenuSizeDTO {
 
     private Long id;
+    private Long menuId;
     private Long sizeId;
     private BigDecimal price;
 

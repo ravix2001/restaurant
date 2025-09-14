@@ -10,7 +10,7 @@ public interface SizeGroupService {
     SizeGroupDB create(SizeGroupDTO sizeGroupDTO);
     SizeGroupDB update(SizeGroupDTO sizeGroupDTO);
     void delete(Long id);
-    List<SizeGroupDB> findByCategoryId(Long categoryId);
+    List<SizeGroupDB> findAll();
     SizeGroupDB getById(Long id);
 
 }

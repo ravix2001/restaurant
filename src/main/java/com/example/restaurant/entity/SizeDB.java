@@ -1,5 +1,6 @@
 package com.example.restaurant.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,10 @@ public class SizeDB {
     @Column(nullable = false, length = 100)
     private String name;
 
+    // new way
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "size_group_id", nullable = false)
+    @JoinColumn(name = "size_group_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnore     // To prevent serialization to avoid circular reference
     private SizeGroupDB sizeGroupDB;
 
     @Column(name = "size_group_id", insertable = false, updatable = false)
