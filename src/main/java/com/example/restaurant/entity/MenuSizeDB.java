@@ -23,7 +23,7 @@ public class MenuSizeDB {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
-    private MenuDB item;
+    private MenuDB menuDB;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "size_id", nullable = false)

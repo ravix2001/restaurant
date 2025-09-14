@@ -1,5 +1,6 @@
 package com.example.restaurant.service.impl;
 
+import com.example.restaurant.dto.SizeDTO;
 import com.example.restaurant.dto.SizeGroupDTO;
 import com.example.restaurant.entity.CategoryDB;
 import com.example.restaurant.entity.SizeGroupDB;
@@ -22,17 +23,22 @@ public class SizeGroupServiceImpl implements SizeGroupService {
     }
 
     @Override
-    public SizeGroupDB create(Long categoryId, SizeGroupDTO sizeGroupDTO) {
-        CategoryDB category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found"));
+    public SizeGroupDB create(SizeGroupDTO request) {
         SizeGroupDB sizeGroupDB = new SizeGroupDB();
-        sizeGroupDB.setName(sizeGroupDTO.getName());
-        sizeGroupDB.setDescription(sizeGroupDTO.getDescription());
-        sizeGroupDB.setCategory(category);
+        sizeGroupDB.setName(request.getName());
+        sizeGroupDB.setDescription(request.getDescription());
+
+        for(SizeDTO size : request.getSizes()){
+            // handle size
+
+        }
+
         return sizeGroupRepository.save(sizeGroupDB);
     }
 
     @Override
-    public SizeGroupDB update(Long id, SizeGroupDTO sizeGroupDTO) {
+    public SizeGroupDB update(SizeGroupDTO sizeGroupDTO) {
+        Long id = sizeGroupDTO.getId();
         SizeGroupDB sizeGroupDB = sizeGroupRepository.findById(id).orElseThrow(() -> new RuntimeException("SizeGroup not found"));
         sizeGroupDB.setName(sizeGroupDTO.getName());
         sizeGroupDB.setDescription(sizeGroupDTO.getDescription());

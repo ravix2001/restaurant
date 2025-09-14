@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/items")
+@RequestMapping("/api/menu")
 public class MenuController {
 
     private final MenuService menuService;
@@ -26,7 +26,7 @@ public class MenuController {
     public ResponseEntity<MenuDB> get(@PathVariable Long id) { return ResponseEntity.ok(menuService.getById(id)); }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MenuDB> update(@PathVariable Long id, @RequestBody MenuDTO menuDTO) { return ResponseEntity.ok(menuService.update(id, menuDTO)); }
+    public ResponseEntity<MenuDB> update(@RequestBody MenuDTO menuDTO) { return ResponseEntity.ok(menuService.update(menuDTO)); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) { menuService.delete(id); return ResponseEntity.noContent().build(); }

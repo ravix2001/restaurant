@@ -8,7 +8,7 @@ import java.util.List;
 public interface MenuService {
 
     MenuDB create(MenuDTO menuDTO);
-    MenuDB update(Long id, MenuDTO menuDTO);
+    MenuDB update(MenuDTO menuDTO);
     void delete(Long id);
     MenuDB getById(Long id);
     List<MenuDB> getAll();

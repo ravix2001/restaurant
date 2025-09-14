@@ -22,4 +22,7 @@ public class SizeDB {
     @JoinColumn(name = "size_group_id", nullable = false)
     private SizeGroupDB sizeGroupDB;
 
+    @Column(name = "size_group_id", insertable = false, updatable = false)
+    private Long sizeGroupId;
+
 }

@@ -18,9 +18,9 @@ public class SizeGroupController {
         this.sizeGroupService = sizeGroupService;
     }
 
-    @PostMapping("/category/{categoryId}")
-    public ResponseEntity<SizeGroupDB> create(@PathVariable Long categoryId, @RequestBody SizeGroupDTO sizeGroupDTO) {
-        return ResponseEntity.ok(sizeGroupService.create(categoryId, sizeGroupDTO));
+    @PostMapping
+    public ResponseEntity<SizeGroupDB> create(@RequestBody SizeGroupDTO sizeGroupDTO) {
+        return ResponseEntity.ok(sizeGroupService.create(sizeGroupDTO));
     }
 
     @GetMapping("/category/{categoryId}")
@@ -32,7 +32,7 @@ public class SizeGroupController {
     public ResponseEntity<SizeGroupDB> get(@PathVariable Long id) { return ResponseEntity.ok(sizeGroupService.getById(id)); }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SizeGroupDB> update(@PathVariable Long id, @RequestBody SizeGroupDTO sizeGroupDTO) { return ResponseEntity.ok(sizeGroupService.update(id, sizeGroupDTO)); }
+    public ResponseEntity<SizeGroupDB> update(@RequestBody SizeGroupDTO sizeGroupDTO) { return ResponseEntity.ok(sizeGroupService.update(sizeGroupDTO)); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) { sizeGroupService.delete(id); return ResponseEntity.noContent().build(); }

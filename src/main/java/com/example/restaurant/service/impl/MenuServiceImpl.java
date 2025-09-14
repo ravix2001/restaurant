@@ -47,7 +47,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
-    public MenuDB update(Long id, MenuDTO menuDTO) {
+    public MenuDB update(MenuDTO menuDTO) {
+        Long id = menuDTO.getId();
         MenuDB menuDB = menuRepository.findById(id).orElseThrow(() -> new RuntimeException("Menu not found"));
         menuDB.setName(menuDTO.getName());
         menuDB.setDescription(menuDTO.getDescription());

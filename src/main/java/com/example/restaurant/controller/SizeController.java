@@ -28,7 +28,7 @@ public class SizeController {
     public ResponseEntity<SizeDB> get(@PathVariable Long id) { return ResponseEntity.ok(sizeService.getById(id)); }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SizeDB> update(@PathVariable Long id, @RequestBody SizeDTO sizeDTO) { return ResponseEntity.ok(sizeService.update(id, sizeDTO)); }
+    public ResponseEntity<SizeDB> update(@RequestBody SizeDTO sizeDTO) { return ResponseEntity.ok(sizeService.update(sizeDTO)); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) { sizeService.delete(id); return ResponseEntity.noContent().build(); }

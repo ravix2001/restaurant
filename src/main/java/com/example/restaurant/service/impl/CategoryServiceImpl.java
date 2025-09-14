@@ -27,7 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDB update(Long id, CategoryDTO categoryDTO) {
+    public CategoryDB update(CategoryDTO categoryDTO) {
+        Long id = categoryDTO.getId();
         CategoryDB categoryDB = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
         categoryDB.setName(categoryDTO.getName());
         categoryDB.setDescription(categoryDTO.getDescription());
