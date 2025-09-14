@@ -9,6 +9,6 @@ public class SizeDTO {
 
     private Long id;
     private String name;
-    private Long sizeGroupId;
+//    private Long sizeGroupId;
 
 }
