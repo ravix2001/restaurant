@@ -29,9 +29,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.create(dto));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryDB> update(@PathVariable Long id, @RequestBody CategoryDTO dto) {
-        return ResponseEntity.ok(categoryService.update(id, dto));
+    @PutMapping
+    public ResponseEntity<CategoryDB> update(@RequestBody CategoryDTO request) {
+        return ResponseEntity.ok(categoryService.update(request));
     }
 
     @DeleteMapping("/{id}")

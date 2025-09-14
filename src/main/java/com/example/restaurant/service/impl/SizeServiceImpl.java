@@ -31,7 +31,8 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public SizeDB update(Long id, SizeDTO sizeDTO) {
+    public SizeDB update(SizeDTO sizeDTO) {
+        Long id = sizeDTO.getId();
         SizeDB sizeDB = sizeRepository.findById(id).orElseThrow(() -> new RuntimeException("Size not found"));
         sizeDB.setName(sizeDTO.getName());
         return sizeRepository.save(sizeDB);

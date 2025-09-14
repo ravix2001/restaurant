@@ -4,6 +4,8 @@ import com.example.restaurant.entity.CategoryDB;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class SizeGroupDTO {
@@ -11,6 +13,6 @@ public class SizeGroupDTO {
     private Long id;
     private String name;
     private String description;
-    private Long categoryId;
+    private List<SizeDTO> sizes;
 
 }

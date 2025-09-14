@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface SizeGroupService {
 
-    SizeGroupDB create(Long categoryId, SizeGroupDTO sizeGroupDTO);
-    SizeGroupDB update(Long id, SizeGroupDTO sizeGroupDTO);
+    SizeGroupDB create(SizeGroupDTO sizeGroupDTO);
+    SizeGroupDB update(SizeGroupDTO sizeGroupDTO);
     void delete(Long id);
     List<SizeGroupDB> findByCategoryId(Long categoryId);
     SizeGroupDB getById(Long id);

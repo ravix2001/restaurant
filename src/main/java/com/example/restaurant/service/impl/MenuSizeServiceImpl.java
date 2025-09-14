@@ -4,7 +4,6 @@ import com.example.restaurant.dto.MenuSizeDTO;
 import com.example.restaurant.entity.MenuDB;
 import com.example.restaurant.entity.MenuSizeDB;
 import com.example.restaurant.entity.SizeDB;
-import com.example.restaurant.mapper.ItemSizeMapper;
 import com.example.restaurant.repository.MenuRepository;
 import com.example.restaurant.repository.MenuSizeRepository;
 import com.example.restaurant.repository.SizeRepository;
@@ -18,46 +17,47 @@ import java.util.stream.Collectors;
 @Service
 public class MenuSizeServiceImpl implements MenuSizeService {
 
-    private final MenuRepository itemRepo;
-    private final SizeRepository sizeRepo;
-    private final MenuSizeRepository itemSizeRepo;
-    private final ItemSizeMapper mapper;
+    private final MenuRepository menuRepository;
+    private final SizeRepository sizeRepository;
+    private final MenuSizeRepository menuSizeRepository;
 
-    public MenuSizeServiceImpl(MenuRepository itemRepo, SizeRepository sizeRepo, MenuSizeRepository itemSizeRepo, ItemSizeMapper mapper) {
-        this.itemRepo = itemRepo;
-        this.sizeRepo = sizeRepo;
-        this.itemSizeRepo = itemSizeRepo;
-        this.mapper = mapper;
+    public MenuSizeServiceImpl(MenuRepository menuRepository, SizeRepository sizeRepository, MenuSizeRepository menuSizeRepository) {
+        this.menuRepository = menuRepository;
+        this.sizeRepository = sizeRepository;
+        this.menuSizeRepository = menuSizeRepository;
     }
 
     @Override
     @Transactional
-    public MenuSizeDTO setPrice(Long itemId, MenuSizeDTO dto) {
-        MenuDB item = itemRepo.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
-        SizeDB sizeDB = sizeRepo.findById(dto.getSizeId()).orElseThrow(() -> new RuntimeException("Size not found"));
+    public MenuSizeDB setPrice(Long menuId, MenuSizeDTO menuSizeDTO) {
+        MenuDB menuDB = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
+        SizeDB sizeDB = sizeRepository.findById(menuSizeDTO.getSizeId()).orElseThrow(() -> new RuntimeException("Size not found"));
 
-        // Optional business rule: ensure size belongs to item's category's size groups:
-        // if (! size.getSizeGroup().getCategory().getId().equals(item.getCategory().getId())) throw new RuntimeException(...);
+        // Fetch if already present or create a new MenuSizeDB entity if not present
+        MenuSizeDB menuSizeDB = menuSizeRepository.findByMenuIdAndSizeId(menuId, menuSizeDTO.getSizeId())
+                .orElseGet(() -> {
+                    MenuSizeDB newMenuSize = new MenuSizeDB();
+                    newMenuSize.setMenuDB(menuDB);
+                    newMenuSize.setSizeDB(sizeDB);
+                    return newMenuSize;
+                });
 
-        MenuSizeDB is = itemSizeRepo.findByItemIdAndSizeId(itemId, dto.getSizeId()).orElseGet(() -> {
-            MenuSizeDB n = new MenuSizeDB();
-            n.setItem(item);
-            n.setSizeDB(sizeDB);
-            return n;
-        });
-        is.setPrice(dto.getPrice());
-        MenuSizeDB saved = itemSizeRepo.save(is);
-        return mapper.toDTO(saved);
+        // Set price and save
+        menuSizeDB.setPrice(menuSizeDTO.getPrice());
+        MenuSizeDB savedMenuSize = menuSizeRepository.save(menuSizeDB);
+
+        return savedMenuSize;
     }
 
     @Override
     @Transactional
-    public void removePrice(Long itemId, Long sizeId) {
-        itemSizeRepo.findByItemIdAndSizeId(itemId, sizeId).ifPresent(itemSizeRepo::delete);
+    public void removePrice(Long menuId, Long sizeId) {
+        MenuSizeDB menuSizeDB = menuSizeRepository.findByMenuIdAndSizeId(menuId, sizeId).orElseThrow(() -> new RuntimeException("MenuSize not found for Menu ID: " + menuId + ", Size ID: " + sizeId));
+        menuSizeRepository.delete(menuSizeDB);
     }
 
     @Override
-    public List<MenuSizeDTO> listForItem(Long itemId) {
-        return itemSizeRepo.findByItemId(itemId).stream().map(mapper::toDTO).collect(Collectors.toList());
+    public List<MenuSizeDB> listForMenu(Long menuId) {
+        return menuSizeRepository.findByMenuId(menuId);
     }
 }

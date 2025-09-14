@@ -8,7 +8,7 @@ import java.util.List;
 public interface CategoryService {
 
     CategoryDB create(CategoryDTO categoryDTO);
-    CategoryDB update(Long id, CategoryDTO categoryDTO);
+    CategoryDB update(CategoryDTO categoryDTO);
     void delete(Long id);
     List<CategoryDB> getAll();
     CategoryDB getById(Long id);
