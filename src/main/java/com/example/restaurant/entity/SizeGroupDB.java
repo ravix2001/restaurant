@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,10 +19,7 @@ public class SizeGroupDB {
     @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(columnDefinition = "text")
-    private String description;
-
-    @OneToMany(mappedBy = "sizeGroupDB", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "sizeGroupDB", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SizeDB> sizes;
 
 }

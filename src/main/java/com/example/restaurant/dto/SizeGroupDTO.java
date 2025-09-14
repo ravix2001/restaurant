@@ -11,7 +11,6 @@ public class SizeGroupDTO {
 
     private Long id;
     private String name;
-    private String description;
     private List<SizeDTO> sizes;
 
 }
