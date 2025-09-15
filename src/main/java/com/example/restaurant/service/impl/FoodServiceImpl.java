@@ -7,21 +7,21 @@ import com.example.restaurant.repository.CategoryRepository;
 import com.example.restaurant.repository.MenuRepository;
 import com.example.restaurant.repository.MenuSizeRepository;
 import com.example.restaurant.repository.SizeRepository;
-import com.example.restaurant.service.MenuService;
+import com.example.restaurant.service.FoodService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class MenuServiceImpl implements MenuService {
+public class FoodServiceImpl implements FoodService {
 
     private final MenuRepository menuRepository;
     private final CategoryRepository categoryRepository;
     private final SizeRepository sizeRepository;
     private final MenuSizeRepository menuSizeRepository;
 
-    public MenuServiceImpl(MenuRepository menuRepository, CategoryRepository categoryRepository, SizeRepository sizeRepository, MenuSizeRepository menuSizeRepository) {
+    public FoodServiceImpl(MenuRepository menuRepository, CategoryRepository categoryRepository, SizeRepository sizeRepository, MenuSizeRepository menuSizeRepository) {
         this.menuRepository = menuRepository;
         this.categoryRepository = categoryRepository;
         this.sizeRepository = sizeRepository;

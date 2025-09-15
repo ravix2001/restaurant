@@ -5,7 +5,7 @@ import com.example.restaurant.entity.MenuDB;
 
 import java.util.List;
 
-public interface MenuService {
+public interface FoodService {
 
     MenuDB create(MenuDTO menuDTO);
     MenuDB update(MenuDTO menuDTO);

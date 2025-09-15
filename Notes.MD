@@ -3,15 +3,15 @@ Dependency Injection:
 @Autowired Annotation:
 ```
 @Autowired
-private final MenuService menuService;
+private final MenuService foodService;
 ```
 When Spring encounters this annotation, it automatically injects the appropriate bean at runtime.
 
 Constructor Injection:
 ```
-private final MenuService menuService;
-public MenuController(MenuService menuService) {
-    this.menuService = menuService;
+private final MenuService foodService;
+public MenuController(MenuService foodService) {
+    this.foodService = foodService;
 }
 ```
 It is a preferred approach in Spring for its simplicity, immutability, and compile-time safety.
