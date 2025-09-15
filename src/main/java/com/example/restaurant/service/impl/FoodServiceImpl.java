@@ -178,12 +178,26 @@ public class FoodServiceImpl implements FoodService {
 //
 //        menuRepository.save(existingMenu);
 //
+//        List<MenuSizeDTO> menuSizeDTOs = new ArrayList<>();
+//        for (MenuSizeDB menuSizeDB : menuSizeDBList) {
+//            MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
+//            menuSizeDTO.setId(menuSizeDB.getId());
+//            menuSizeDTO.setPrice(menuSizeDB.getPrice());
+//            menuSizeDTO.setMenuId(menuSizeDB.getMenuDB().getId());
+//            menuSizeDTO.setSizeId(menuSizeDB.getSizeDB().getId());
+//            menuSizeDTOs.add(menuSizeDTO);
+//        }
+//
+//        menuDTO.setId(menu.getId());
+//        menuDTO.setSizeGroupId(sizeGroupId);
+//        menuDTO.setMenuSizes(menuSizeDTOs);
+//
 //        List<MenuSizeDTO> updatedMenuSizeDTOs = updatedMenuSizeDBList.stream()
 //                .map(menuSizeDB -> new MenuSizeDTO(
 //                        menuSizeDB.getId(),
 //                        menuSizeDB.getPrice(),
-//                        menuSizeDB.getMenu().getId(),
-//                        menuSizeDB.getSize().getId()))
+//                        menuSizeDB.getMenuDB().getId(),
+//                        menuSizeDB.getSizeDB().getId()))
 //                .collect(Collectors.toList());
 //
 //        menuDTO.setName(existingMenu.getName());
