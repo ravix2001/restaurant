@@ -32,11 +32,6 @@ public class OptionGroupServiceImpl implements OptionGroupService {
             optionDB.setName(optionDTO.getName());
             optionDB.setOptionGroupDB(optionGroupDB);
 
-            // Initialize options list if null
-            if (optionGroupDB.getOptions() == null) {
-                optionGroupDB.setOptions(new ArrayList<>());
-            }
-            optionGroupDB.getOptions().add(optionDB);
             optionRepository.save(optionDB);
         }
         return saved;
@@ -67,7 +62,7 @@ public class OptionGroupServiceImpl implements OptionGroupService {
                 optionDB = new OptionDB();
                 optionDB.setName(optionDTO.getName());
                 optionDB.setOptionGroupDB(optionGroupDB);
-                optionGroupDB.getOptions().add(optionDB);
+//                optionGroupDB.getOptions().add(optionDB);
                 optionRepository.save(optionDB);
             }
         }

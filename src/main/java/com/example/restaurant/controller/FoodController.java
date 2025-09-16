@@ -19,14 +19,14 @@ public class FoodController {
     public FoodController(FoodService foodService) { this.foodService = foodService; }
 
     @PostMapping("/createMenu")
-    public ResponseEntity<MenuDTO> createMenu(@RequestBody MenuDTO menuDTO) {
+    public ResponseEntity<String> createMenu(@RequestBody MenuDTO menuDTO) {
         return new ResponseEntity<>(foodService.createMenuAndSize(menuDTO), HttpStatus.OK);
     }
 
-//    @PutMapping("/updateMenu")
-//    public ResponseEntity<MenuDTO> updateMenu(@RequestBody MenuDTO menuDTO) {
-//        return new ResponseEntity<>(foodService.updateMenuAndSize(menuDTO), HttpStatus.OK);
-//    }
+    @PutMapping("/updateMenu")
+    public ResponseEntity<String> updateMenu(@RequestBody MenuDTO menuDTO) {
+        return new ResponseEntity<>(foodService.updateMenuAndSize(menuDTO), HttpStatus.OK);
+    }
 
     @GetMapping("/getAllMenus")
     public ResponseEntity<List<MenuDTO>> getAllMenus() {

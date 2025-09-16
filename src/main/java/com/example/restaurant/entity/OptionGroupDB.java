@@ -18,7 +18,4 @@ public class OptionGroupDB {
 
     private String name;
 
-    @OneToMany(mappedBy = "optionGroupDB", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OptionDB> options;
-
 }
