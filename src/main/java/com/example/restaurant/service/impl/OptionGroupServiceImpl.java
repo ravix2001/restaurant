@@ -7,10 +7,13 @@ import com.example.restaurant.entity.OptionGroupDB;
 import com.example.restaurant.repository.OptionGroupRepository;
 import com.example.restaurant.repository.OptionRepository;
 import com.example.restaurant.service.OptionGroupService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
 public class OptionGroupServiceImpl implements OptionGroupService {
 
     private final OptionGroupRepository optionGroupRepository;
@@ -32,11 +35,18 @@ public class OptionGroupServiceImpl implements OptionGroupService {
             optionDB.setName(optionDTO.getName());
             optionDB.setOptionGroupDB(optionGroupDB);
 
+            // Initialize sizes list if null
+            if (optionGroupDB.getOptions() == null) {
+                optionGroupDB.setOptions(new ArrayList<>());
+            }
+            optionGroupDB.getOptions().add(optionDB);
+
             optionRepository.save(optionDB);
         }
         return saved;
     }
 
+    // this works if you just add the options you want to add in the menu in the RequestBody
     @Override
     public OptionGroupDB update(OptionGroupDTO request) {
         Long id = request.getId();
@@ -69,6 +79,54 @@ public class OptionGroupServiceImpl implements OptionGroupService {
         return saved;
 
     }
+
+    // this works if you just add all the options you want to add in the menu in the RequestBody
+    // but the old options get deleted and new options with different id and same name are added
+
+//    @Override
+//    @Transactional
+//    public OptionGroupDB update(OptionGroupDTO request) {
+//        Long id = request.getId();
+//        OptionGroupDB optionGroupDB = optionGroupRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("OptionGroup not found"));
+//
+//        // Update group name
+//        optionGroupDB.setName(request.getName());
+//
+//        // Fetch existing options from DB
+//        List<OptionDB> existingOptions = optionRepository.findByOptionGroupId(id);
+//
+//        // Map existing options by ID for quick lookup
+//        Map<Long, OptionDB> existingMap = existingOptions.stream()
+//                .collect(Collectors.toMap(OptionDB::getId, o -> o));
+//
+//        // Collect IDs from request
+//        Set<Long> requestedIds = new HashSet<>();
+//
+//        for (OptionDTO optionDTO : request.getOptions()) {
+//            if (optionDTO.getId() != null && existingMap.containsKey(optionDTO.getId())) {
+//                // Case 1: Update existing
+//                OptionDB optionDB = existingMap.get(optionDTO.getId());
+//                optionDB.setName(optionDTO.getName());
+//                requestedIds.add(optionDB.getId());
+//            } else {
+//                // Case 2: Insert new
+//                OptionDB newOption = new OptionDB();
+//                newOption.setName(optionDTO.getName());
+//                newOption.setOptionGroupDB(optionGroupDB);
+//                optionRepository.save(newOption);
+//            }
+//        }
+//
+//        // Case 3: Delete options not present in request
+//        for (OptionDB existing : existingOptions) {
+//            if (!requestedIds.contains(existing.getId())) {
+//                optionRepository.delete(existing);
+//            }
+//        }
+//
+//        return optionGroupRepository.save(optionGroupDB);
+//    }
 
     @Override
     public void delete(Long id) {
