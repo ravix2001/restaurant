@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,5 +17,8 @@ public class OptionGroupDB {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "optionGroupDB", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OptionDB> options;
 
 }
