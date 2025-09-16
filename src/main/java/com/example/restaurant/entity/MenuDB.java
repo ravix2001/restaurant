@@ -34,4 +34,10 @@ public class MenuDB {
     @Column(name = "category_id", insertable = false, updatable = false)
     private Long categoryId;
 
+    // added to setSizeGroup in menu
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "size_group_id", referencedColumnName = "id")
+    private SizeGroupDB sizeGroup;
+
+
 }
