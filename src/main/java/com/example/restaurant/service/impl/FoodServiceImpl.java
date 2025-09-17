@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -231,53 +232,10 @@ public class FoodServiceImpl implements FoodService {
                 .collect(Collectors.toList());
 
         // Set the options to the MenuDTO
-        menuDTO.setOptions(optionDTOs);
+        menuDTO.setMenuOptions(optionDTOs);
 
         return menuDTO;
     }
-
-    @Override
-    public MenuDTO getMenuOptionsDetailed(Long id) {
-
-        MenuDB menuDB = menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Menu not found"));
-
-        List<SizeGroupOptionGroupDB> sizeGroupOptionGroupDBList =
-                sizeGroupOptionGroupRepository.findBySizeGroupId(menuDB.getSizeGroup().getId());
-
-
-        List<OptionDB> allOptions = new ArrayList<>();
-        for (SizeGroupOptionGroupDB sizeGroupOptionGroupDB : sizeGroupOptionGroupDBList) {
-            allOptions.addAll(optionRepository.findByOptionGroupId(sizeGroupOptionGroupDB.getOptionGroupId()));
-        }
-
-        MenuDTO menuDTO = new MenuDTO();
-        menuDTO.setId(id);
-
-        List<OptionDTO> optionDTOList = new ArrayList<>();
-        List<MenuOptionDB> menuOptionDBList = menuOptionRepository.findByMenuId(menuDB.getId());
-
-        for (OptionDB optionDB : allOptions) {
-            OptionDTO optionDTO = new OptionDTO();
-            optionDTO.setId(optionDB.getId());
-            optionDTO.setName(optionDB.getName());
-
-            boolean isSelected = false;
-            for (MenuOptionDB menuOptionDB : menuOptionDBList) {
-                if (menuOptionDB.getOptionDB().getId().equals(optionDB.getId())) {
-//                    optionDTO.setSelected(true);
-                    isSelected = true;
-                    break;
-                }
-            }
-            optionDTO.setSelected(isSelected);
-            optionDTOList.add(optionDTO);
-        }
-        menuDTO.setOptions(optionDTOList);
-        return menuDTO;
-
-    }
-
 
     @Override
     @Transactional
@@ -290,8 +248,8 @@ public class FoodServiceImpl implements FoodService {
         List<MenuOptionDB> existingMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
 
         // Process options to add or update
-        if (menuDTO.getOptions() != null && !menuDTO.getOptions().isEmpty()) {
-            for (OptionDTO optionDTO : menuDTO.getOptions()) {
+        if (menuDTO.getMenuOptions() != null && !menuDTO.getMenuOptions().isEmpty()) {
+            for (OptionDTO optionDTO : menuDTO.getMenuOptions()) {
                 // Check if the option already exists for the menu
                 MenuOptionDB menuOptionDB = existingMenuOptions.stream()
                         .filter(existingOption -> existingOption.getOptionDB().getId().equals(optionDTO.getId()))
@@ -343,9 +301,80 @@ public class FoodServiceImpl implements FoodService {
         responseDTO.setName(menuDB.getName());
         responseDTO.setDescription(menuDB.getDescription());
         responseDTO.setBasePrice(menuDB.getBasePrice());
-        responseDTO.setOptions(responseOptions);
+        responseDTO.setMenuOptions(responseOptions);
         responseDTO.setRemovedOptions(menuDTO.getRemovedOptions()); // Removed options are already updated
 
         return responseDTO; // Return response with fresh and accurate options
+    }
+
+    @Override
+    public MenuDTO getMenuOptionsDetailed(Long id) {
+
+        MenuDB menuDB = menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+        List<SizeGroupOptionGroupDB> sizeGroupOptionGroupDBList =
+                sizeGroupOptionGroupRepository.findBySizeGroupId(menuDB.getSizeGroup().getId());
+
+
+        List<OptionDB> allOptions = new ArrayList<>();
+        for (SizeGroupOptionGroupDB sizeGroupOptionGroupDB : sizeGroupOptionGroupDBList) {
+            allOptions.addAll(optionRepository.findByOptionGroupId(sizeGroupOptionGroupDB.getOptionGroupId()));
+        }
+
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setId(id);
+
+        List<OptionDTO> optionDTOList = new ArrayList<>();
+        List<MenuOptionDB> menuOptionDBList = menuOptionRepository.findByMenuId(menuDB.getId());
+
+        for (OptionDB optionDB : allOptions) {
+            OptionDTO optionDTO = new OptionDTO();
+            optionDTO.setId(optionDB.getId());
+            optionDTO.setName(optionDB.getName());
+
+            boolean isSelected = false;
+            for (MenuOptionDB menuOptionDB : menuOptionDBList) {
+                if (menuOptionDB.getOptionDB().getId().equals(optionDB.getId())) {
+//                    optionDTO.setSelected(true);
+                    isSelected = true;
+                    break;
+                }
+            }
+            optionDTO.setSelected(isSelected);
+            optionDTOList.add(optionDTO);
+        }
+        menuDTO.setMenuOptions(optionDTOList);
+        return menuDTO;
+
+    }
+
+    @Override
+    public MenuDTO handleMenuOptionsDetailed(MenuDTO menuDTO) {
+        Long menuId = menuDTO.getId();
+
+        MenuDB menuDB = menuRepository.findById(menuId).orElseThrow(() -> new RuntimeException("Menu not found"));
+
+        List<OptionDTO> submittedOptions = menuDTO.getMenuOptions();
+
+//        List<MenuOptionDB> savedOptions = menuOptionRepository.findAllByMenuId(menuId);
+
+        for (OptionDTO submittedOptionDTO : submittedOptions) {
+
+            MenuOptionDB menuOptionDB = menuOptionRepository.findByOptionId(submittedOptionDTO.getId());
+
+            if (menuOptionDB == null && submittedOptionDTO.isSelected()) {
+                MenuOptionDB newOption = new MenuOptionDB();
+                newOption.setMenuId(menuId);
+                newOption.setMenuDB(menuDB);
+                OptionDB optionDB = optionRepository.findById(submittedOptionDTO.getId()).orElseThrow(() -> new RuntimeException("Option not found"));
+                newOption.setOptionDB(optionDB);
+                menuOptionRepository.save(newOption);
+            } else if (menuOptionDB != null && !submittedOptionDTO.isSelected()) {
+                menuOptionRepository.delete(menuOptionDB);
+            }
+        }
+
+        return menuDTO;
     }
 }

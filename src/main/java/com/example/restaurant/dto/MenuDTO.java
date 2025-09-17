@@ -27,7 +27,7 @@ public class MenuDTO {
     // Add this field to include optionGroups
     private List<OptionGroupDTO> optionGroups;
 
-    private List<OptionDTO> options;
+    private List<OptionDTO> menuOptions;
     private List<OptionDTO> removedOptions;
 
 

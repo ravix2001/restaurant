@@ -15,7 +15,7 @@ public interface FoodService {
 
     MenuDTO getMenuOptionsDetailed(Long menuId);
 
-//    MenuDTO handleMenuOptions(Long menuId);
+    MenuDTO handleMenuOptionsDetailed(MenuDTO menuDTO);
 
     MenuDTO handleMenuOptions(MenuDTO menuDTO);
 
