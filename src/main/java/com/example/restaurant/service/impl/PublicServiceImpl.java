@@ -50,6 +50,19 @@ public class PublicServiceImpl implements PublicService {
                 })
                 .collect(Collectors.toList());
 
+        // Fetch selected menu options
+        List<MenuOptionDB> selectedMenuOptions = menuOptionRepository.findByMenuId(menuId);
+        List<OptionDTO> selectedOptions = selectedMenuOptions.stream()
+                .map(menuOptionDB -> {
+                    OptionDTO optionDTO = new OptionDTO();
+                    optionDTO.setId(menuOptionDB.getOptionDB().getId());
+                    optionDTO.setName(menuOptionDB.getOptionDB().getName());
+                    optionDTO.setOptionGroupId(menuOptionDB.getOptionDB().getOptionGroupId());
+                    optionDTO.setSelected(true); // Mark this option as selected
+                    return optionDTO;
+                })
+                .collect(Collectors.toList());
+
         // Fetch option groups associated with the SizeGroup
         List<OptionGroupDTO> optionGroupDTOs = Optional.ofNullable(menuDB.getSizeGroup())
                 .map(sizeGroup -> sizeGroupOptionGroupRepository.findBySizeGroupId(sizeGroup.getId()))
@@ -58,13 +71,16 @@ public class PublicServiceImpl implements PublicService {
                 .map(sizeGroupOptionGroupDB -> {
                     OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
 
-                    // Map options within this option group
+                    // Map options within this option group, including selection status
                     List<OptionDTO> optionDTOs = optionGroupDB.getOptions().stream()
                             .map(optionDB -> {
                                 OptionDTO optionDTO = new OptionDTO();
                                 optionDTO.setId(optionDB.getId());
                                 optionDTO.setName(optionDB.getName());
                                 optionDTO.setOptionGroupId(optionGroupDB.getId());
+                                // Mark option as selected if it matches the selected options
+                                optionDTO.setSelected(selectedOptions.stream()
+                                        .anyMatch(selectedOption -> selectedOption.getId().equals(optionDB.getId())));
                                 return optionDTO;
                             })
                             .collect(Collectors.toList());
@@ -84,8 +100,9 @@ public class PublicServiceImpl implements PublicService {
         menuDTO.setId(menuDB.getId());
         menuDTO.setName(menuDB.getName());
         menuDTO.setBasePrice(menuDB.getBasePrice());
-        menuDTO.setSizes(sizeDTOs); // Add sizes
-        menuDTO.setOptionGroups(optionGroupDTOs); // Add option groups instead of options
+        menuDTO.setSizes(sizeDTOs);             // Add sizes list
+        menuDTO.setOptions(selectedOptions);   // Add selected menuOptions in the existing options field
+        menuDTO.setOptionGroups(optionGroupDTOs); // Add option groups including selected status
 
         return menuDTO;
     }
