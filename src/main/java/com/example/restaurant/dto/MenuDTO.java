@@ -1,5 +1,6 @@
 package com.example.restaurant.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MenuDTO {
 
     private Long id;
@@ -18,7 +20,15 @@ public class MenuDTO {
     private Long sizeGroupId;
 
     private List<MenuSizeDTO> menuSizes;
+
+    // Add this field to include sizes in the response
+    private List<SizeDTO> sizes;
+
+    // Add this field to include optionGroups
+    private List<OptionGroupDTO> optionGroups;
+
     private List<OptionDTO> options;
     private List<OptionDTO> removedOptions;
+
 
 }
