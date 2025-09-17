@@ -100,9 +100,9 @@ public class PublicServiceImpl implements PublicService {
         menuDTO.setId(menuDB.getId());
         menuDTO.setName(menuDB.getName());
         menuDTO.setBasePrice(menuDB.getBasePrice());
-        menuDTO.setSizes(sizeDTOs);             // Add sizes list
-        menuDTO.setMenuOptions(selectedOptions);   // Add selected menuOptions in the existing options field
-        menuDTO.setOptionGroups(optionGroupDTOs); // Add option groups including selected status
+        menuDTO.setSizes(sizeDTOs);
+        menuDTO.setMenuOptions(selectedOptions);
+        menuDTO.setOptionGroups(optionGroupDTOs);
 
         return menuDTO;
     }

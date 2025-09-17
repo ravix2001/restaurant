@@ -62,16 +62,21 @@ public class FoodController {
         return ResponseEntity.ok(menuDTO);
     }
 
-    @GetMapping("/getMenuOptionsDetailed/{menuId}")
-    public ResponseEntity<MenuDTO> getMenuOptionsDetailed(@PathVariable Long menuId) {
-        MenuDTO menuDTO = foodService.getMenuOptionsDetailed(menuId);
-        return ResponseEntity.ok(menuDTO);
-    }
-
     @PutMapping("/handleMenuOptions")
     public ResponseEntity<MenuDTO> handleMenuOptions(@RequestBody MenuDTO menuDTO) {
         foodService.handleMenuOptions(menuDTO);
         return ResponseEntity.ok(menuDTO);
     }
 
+    @GetMapping("/getMenuOptionsDetailed/{menuId}")
+    public ResponseEntity<MenuDTO> getMenuOptionsDetailed(@PathVariable Long menuId) {
+        MenuDTO menuDTO = foodService.getMenuOptionsDetailed(menuId);
+        return ResponseEntity.ok(menuDTO);
+    }
+
+    @PutMapping("/handleMenuOptionsDetailed")
+    public ResponseEntity<MenuDTO> handleMenuOptionsDetailed(@RequestBody MenuDTO menuDTO) {
+        MenuDTO updatedMenuDTO = foodService.handleMenuOptionsDetailed(menuDTO);
+        return ResponseEntity.ok(updatedMenuDTO);
+    }
 }
