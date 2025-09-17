@@ -2,21 +2,27 @@ package com.example.restaurant.controller;
 
 import com.example.restaurant.dto.CategoryDTO;
 import com.example.restaurant.dto.MenuDTO;
-import com.example.restaurant.entity.MenuDB;
+import com.example.restaurant.dto.OptionDTO;
+import com.example.restaurant.dto.SizeOptionGroupDTO;
 import com.example.restaurant.service.FoodService;
+import com.example.restaurant.service.SizeOptionGroupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/food")
 public class FoodController {
 
-    private final FoodService foodService;
+    @Autowired
+    private FoodService foodService;
 
-    public FoodController(FoodService foodService) { this.foodService = foodService; }
+    @Autowired
+    private SizeOptionGroupService sizeOptionGroupService;
 
     @PostMapping("/createMenu")
     public ResponseEntity<String> createMenu(@RequestBody MenuDTO menuDTO) {
@@ -37,4 +43,35 @@ public class FoodController {
     public ResponseEntity<List<CategoryDTO>> getAllCategoriesAndMenus() {
         return new ResponseEntity<>(foodService.getAllCategory(), HttpStatus.OK);
     }
+
+    @PutMapping("/linkSizeGroupAndOptionGroup")
+    public ResponseEntity<String> linkSizeGroupAndOptionGroup(@RequestBody SizeOptionGroupDTO request) {
+        sizeOptionGroupService.linkSizeGroupAndOptionGroup(request);
+        return ResponseEntity.ok("Size group and option group linked successfully.");
+    }
+
+    @DeleteMapping("/unlinkSizeGroupAndOptionGroup/{sizeGroupOptionGroupId}")
+    public ResponseEntity<String> unlinkSizeAndOptionGroup(@PathVariable Long sizeGroupOptionGroupId) {
+        sizeOptionGroupService.unlinkSizeGroupAndOptionGroup(sizeGroupOptionGroupId);
+        return ResponseEntity.ok("Size group and option group unlinked successfully.");
+    }
+
+    @GetMapping("/getMenuWithOptions/{menuId}")
+    public ResponseEntity<MenuDTO> getMenuWithOptions(@PathVariable Long menuId) {
+        MenuDTO menuDTO = foodService.getMenuWithOptions(menuId);
+        return ResponseEntity.ok(menuDTO);
+    }
+
+    @GetMapping("/getMenuOptionsDetailed/{menuId}")
+    public ResponseEntity<List<OptionDTO>> getMenuOptionsDetailed(@PathVariable Long menuId) {
+        List<OptionDTO> options = foodService.getMenuOptionsDetailed(menuId);
+        return ResponseEntity.ok(options);
+    }
+
+    @PutMapping("/handleMenuOptions")
+    public ResponseEntity<MenuDTO> handleMenuOptions(@RequestBody MenuDTO menuDTO) {
+        foodService.handleMenuOptions(menuDTO);
+        return ResponseEntity.ok(menuDTO);
+    }
+
 }

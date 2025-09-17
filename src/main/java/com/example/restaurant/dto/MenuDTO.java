@@ -17,8 +17,8 @@ public class MenuDTO {
     private Long categoryId;
     private Long sizeGroupId;
 
-    List<MenuSizeDTO> menuSizes;
-    List<OptionDTO> options;
-    List<OptionDTO> removedOptions;
+    private List<MenuSizeDTO> menuSizes;
+    private List<OptionDTO> options;
+    private List<OptionDTO> removedOptions;
 
 }

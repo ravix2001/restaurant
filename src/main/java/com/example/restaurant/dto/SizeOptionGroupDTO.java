@@ -5,10 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OptionDTO {
+public class SizeOptionGroupDTO {
 
-    private Long id;
-    private String name;
+    private Long sizeGroupId;
     private Long optionGroupId;
-    private boolean isSelected;
+
 }
