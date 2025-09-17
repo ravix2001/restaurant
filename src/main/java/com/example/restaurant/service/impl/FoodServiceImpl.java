@@ -6,9 +6,12 @@ import com.example.restaurant.repository.*;
 import com.example.restaurant.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FoodServiceImpl implements FoodService {
@@ -32,7 +35,13 @@ public class FoodServiceImpl implements FoodService {
     private OptionRepository optionRepository;
 
     @Autowired
+    private MenuOptionRepository menuOptionRepository;
+
+    @Autowired
     private OptionGroupRepository optionGroupRepository;
+
+    @Autowired
+    private SizeGroupOptionGroupRepository sizeGroupOptionGroupRepository;
 
     @Override
     public String createMenuAndSize(MenuDTO menuDTO) {
@@ -70,24 +79,24 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public String updateMenuAndSize(MenuDTO dto) {
-        MenuDB existingMenu = menuRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("menu not found"));
-        existingMenu.setName(dto.getName());
-        existingMenu.setBasePrice(dto.getBasePrice());
+    public String updateMenuAndSize(MenuDTO menuDTO) {
+        MenuDB existingMenu = menuRepository.findById(menuDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Menu not found"));
+        existingMenu.setName(menuDTO.getName());
+        existingMenu.setBasePrice(menuDTO.getBasePrice());
 
-        CategoryDB existingCategory = categoryRepository.findById(dto.getCategoryId())
+        CategoryDB existingCategory = categoryRepository.findById(menuDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         existingMenu.setCategory(existingCategory);
 
-        SizeGroupDB existingSizeGroup = sizeGroupRepository.findById(dto.getSizeGroupId())
+        SizeGroupDB existingSizeGroup = sizeGroupRepository.findById(menuDTO.getSizeGroupId())
                 .orElseThrow(() -> new RuntimeException("SizeGroup not found"));
         existingMenu.setSizeGroup(existingSizeGroup);
 
         menuRepository.save(existingMenu);
 
         List<MenuSizeDB> menuSizeDBList = menuSizeRepository.findByMenuId(existingMenu.getId());
-        for (MenuSizeDTO menuSizeDTO : dto.getMenuSizes()) {
+        for (MenuSizeDTO menuSizeDTO : menuDTO.getMenuSizes()) {
             for (MenuSizeDB menuSizeDB : menuSizeDBList) {
                 if (menuSizeDB.getId().equals(menuSizeDTO.getId())) {
                     menuSizeDB.setPrice(menuSizeDTO.getPrice());
@@ -98,7 +107,6 @@ public class FoodServiceImpl implements FoodService {
 
         return "Success";
     }
-
 
     @Override
     public List<MenuDTO> getAllMenu() {
@@ -191,39 +199,113 @@ public class FoodServiceImpl implements FoodService {
         return categoryDTOList;
     }
 
-    //    @Override
-//    public String createOptionGroupWithOptions(OptionGroupDTO optionGroupDTO) {
-//
-//        OptionGroupDB optionGroupDB = new OptionGroupDB();
-//        optionGroupDB.setName(optionGroupDTO.getName());
-//        OptionGroupDB savedOptionGroup = optionGroupRepository.save(optionGroupDB);
-//
-//        for (OptionDTO optionDTO : optionGroupDTO.getOptions()) {
-//            OptionDB optionDB = new OptionDB();
-//            optionDB.setName(optionDTO.getName());
-//            optionDB.setOptionGroupDB(savedOptionGroup);
-//            optionRepository.save(optionDB);
-//        }
-//        return "Success";
-//    }
-//
-//    @Override
-//    public String updateOptionGroupWithOptions(OptionGroupDTO optionGroupDTO) {
-//        OptionGroupDB optionGroupDBList = optionGroupRepository.findById(optionGroupDTO.getId())
-//                .orElseThrow(() -> new RuntimeException("Option group not found"));
-//        optionGroupDBList.setName(optionGroupDTO.getName());
-//        OptionGroupDB savedOptionGroup = optionGroupRepository.save(optionGroupDBList);
-//
-//        List<OptionDB> optionDBList = optionRepository.findByOptionGroupId(optionGroupDBList.getId());
-//        for (OptionDTO optionDTO : optionGroupDTO.getOptions()) {
-//            for (OptionDB optionDB : optionDBList) {
-//                if (optionDTO.getId().equals(optionDB.getId())) {
-//                    optionDB.setName(optionDTO.getName());
-//                    optionDB.setOptionGroupDB(savedOptionGroup);
-//                    optionRepository.save(optionDB);
-//                }
-//            }
-//        }
-//        return "Success";
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public MenuDTO getMenuWithOptions(Long menuId) {
+        // Find the menu
+        MenuDB menuDB = menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuId));
+
+        // Fetch the options associated with the menu via MenuOptionDB
+        List<MenuOptionDB> menuOptions = menuOptionRepository.findByMenuId(menuId);
+
+        // Convert MenuDB to MenuDTO
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setId(menuDB.getId());
+        menuDTO.setName(menuDB.getName());
+        menuDTO.setDescription(menuDB.getDescription());
+        menuDTO.setBasePrice(menuDB.getBasePrice());
+        menuDTO.setCategoryId(menuDB.getCategory().getId());
+
+        // Convert MenuOptionDB -> OptionDTO
+        List<OptionDTO> optionDTOs = menuOptions.stream()
+                .map(menuOption -> {
+                    OptionDB optionDB = menuOption.getOptionDB();
+                    OptionDTO optionDTO = new OptionDTO();
+                    optionDTO.setId(optionDB.getId());
+                    optionDTO.setName(optionDB.getName());
+                    optionDTO.setOptionGroupId(optionDB.getOptionGroupId());
+                    optionDTO.setSelected(false);
+                    return optionDTO;
+                })
+                .collect(Collectors.toList());
+
+        // Set the options to the MenuDTO
+        menuDTO.setOptions(optionDTOs);
+
+        return menuDTO;
+    }
+
+    @Override
+    public List<OptionDTO> getMenuOptionsDetailed(Long menuId) {
+        // Fetch menu options for the given menuId
+        List<MenuOptionDB> menuOptions = menuOptionRepository.findByMenuId(menuId);
+
+        // Map MenuOptionDB to OptionDTO
+        return menuOptions.stream().map(menuOption -> {
+            OptionDTO optionDTO = new OptionDTO();
+            optionDTO.setId(menuOption.getOptionId()); // Set option ID
+            optionDTO.setName(menuOption.getOptionDB().getName()); // Set option name
+            optionDTO.setOptionGroupId(menuOption.getOptionDB().getOptionGroupId()); // Set group ID
+            optionDTO.setSelected(true); // Mark as selected
+            return optionDTO;
+        }).collect(Collectors.toList());
+    }
+
+
+
+    @Override
+    @Transactional
+    public MenuDTO handleMenuOptions(MenuDTO menuDTO) {
+        // Validate that the menu exists
+        MenuDB menuDB = menuRepository.findById(menuDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuDTO.getId()));
+
+        // Handle adding new options
+        if (menuDTO.getOptions() != null && !menuDTO.getOptions().isEmpty()) {
+            for (OptionDTO optionDTO : menuDTO.getOptions()) {
+                OptionDB optionDB = optionRepository.findById(optionDTO.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Option not found for ID: " + optionDTO.getId()));
+
+                List<MenuOptionDB> menuOptions = menuOptionRepository.findByMenuIdAndOptionId(menuDTO.getId(), optionDTO.getId());
+                if (menuOptions.isEmpty()) {
+                    MenuOptionDB menuOptionDB = new MenuOptionDB();
+                    menuOptionDB.setMenuDB(menuDB);
+                    menuOptionDB.setOptionDB(optionDB);
+                    menuOptionRepository.save(menuOptionDB);
+                }
+            }
+        }
+
+        // Handle removing options
+        if (menuDTO.getRemovedOptions() != null && !menuDTO.getRemovedOptions().isEmpty()) {
+            for (OptionDTO optionDTO : menuDTO.getRemovedOptions()) {
+                menuOptionRepository.deleteByMenuIdAndOptionId(menuDTO.getId(), optionDTO.getId());
+            }
+        }
+
+        // Fetch updated list of options for the menu
+        List<MenuOptionDB> updatedMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
+
+        List<OptionDTO> updatedOptions = updatedMenuOptions.stream()
+                .map(mo -> {
+                    OptionDTO dto = new OptionDTO();
+                    dto.setId(mo.getOptionDB().getId());
+                    dto.setName(mo.getOptionDB().getName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        // Build the response DTO
+        MenuDTO responseDTO = new MenuDTO();
+        responseDTO.setId(menuDB.getId());
+        responseDTO.setName(menuDB.getName());
+        responseDTO.setDescription(menuDB.getDescription());
+        responseDTO.setBasePrice(menuDB.getBasePrice());
+        responseDTO.setOptions(updatedOptions);
+
+        return responseDTO; // Spring Boot converts this into JSON
+    }
+
+
 }
