@@ -231,7 +231,7 @@ public class FoodServiceImpl implements FoodService {
                 .collect(Collectors.toList());
 
         // Set the options to the MenuDTO
-        menuDTO.setOptions(optionDTOs);
+        menuDTO.setMenuOptions(optionDTOs);
 
         return menuDTO;
     }
@@ -273,7 +273,7 @@ public class FoodServiceImpl implements FoodService {
             optionDTO.setSelected(isSelected);
             optionDTOList.add(optionDTO);
         }
-        menuDTO.setOptions(optionDTOList);
+        menuDTO.setMenuOptions(optionDTOList);
         return menuDTO;
 
     }
@@ -290,8 +290,8 @@ public class FoodServiceImpl implements FoodService {
         List<MenuOptionDB> existingMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
 
         // Process options to add or update
-        if (menuDTO.getOptions() != null && !menuDTO.getOptions().isEmpty()) {
-            for (OptionDTO optionDTO : menuDTO.getOptions()) {
+        if (menuDTO.getMenuOptions() != null && !menuDTO.getMenuOptions().isEmpty()) {
+            for (OptionDTO optionDTO : menuDTO.getMenuOptions()) {
                 // Check if the option already exists for the menu
                 MenuOptionDB menuOptionDB = existingMenuOptions.stream()
                         .filter(existingOption -> existingOption.getOptionDB().getId().equals(optionDTO.getId()))
@@ -343,7 +343,7 @@ public class FoodServiceImpl implements FoodService {
         responseDTO.setName(menuDB.getName());
         responseDTO.setDescription(menuDB.getDescription());
         responseDTO.setBasePrice(menuDB.getBasePrice());
-        responseDTO.setOptions(responseOptions);
+        responseDTO.setMenuOptions(responseOptions);
         responseDTO.setRemovedOptions(menuDTO.getRemovedOptions()); // Removed options are already updated
 
         return responseDTO; // Return response with fresh and accurate options
