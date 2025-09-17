@@ -63,9 +63,9 @@ public class FoodController {
     }
 
     @GetMapping("/getMenuOptionsDetailed/{menuId}")
-    public ResponseEntity<List<OptionDTO>> getMenuOptionsDetailed(@PathVariable Long menuId) {
-        List<OptionDTO> options = foodService.getMenuOptionsDetailed(menuId);
-        return ResponseEntity.ok(options);
+    public ResponseEntity<MenuDTO> getMenuOptionsDetailed(@PathVariable Long menuId) {
+        MenuDTO menuDTO = foodService.getMenuOptionsDetailed(menuId);
+        return ResponseEntity.ok(menuDTO);
     }
 
     @PutMapping("/handleMenuOptions")

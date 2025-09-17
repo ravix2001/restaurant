@@ -225,7 +225,7 @@ public class FoodServiceImpl implements FoodService {
                     optionDTO.setId(optionDB.getId());
                     optionDTO.setName(optionDB.getName());
                     optionDTO.setOptionGroupId(optionDB.getOptionGroupId());
-                    optionDTO.setSelected(false);
+                    optionDTO.setSelected(true);
                     return optionDTO;
                 })
                 .collect(Collectors.toList());
@@ -237,21 +237,46 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public List<OptionDTO> getMenuOptionsDetailed(Long menuId) {
-        // Fetch menu options for the given menuId
-        List<MenuOptionDB> menuOptions = menuOptionRepository.findByMenuId(menuId);
+    public MenuDTO getMenuOptionsDetailed(Long id) {
 
-        // Map MenuOptionDB to OptionDTO
-        return menuOptions.stream().map(menuOption -> {
+        MenuDB menuDB = menuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+        List<SizeGroupOptionGroupDB> sizeGroupOptionGroupDBList =
+                sizeGroupOptionGroupRepository.findBySizeGroupId(menuDB.getSizeGroup().getId());
+
+
+        List<OptionDB> allOptions = new ArrayList<>();
+        for (SizeGroupOptionGroupDB sizeGroupOptionGroupDB : sizeGroupOptionGroupDBList) {
+            allOptions.addAll(optionRepository.findByOptionGroupId(sizeGroupOptionGroupDB.getOptionGroupId()));
+        }
+
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setId(id);
+
+        List<OptionDTO> optionDTOList = new ArrayList<>();
+        List<MenuOptionDB> menuOptionDBList = menuOptionRepository.findByMenuId(menuDB.getId());
+
+        for (OptionDB optionDB : allOptions) {
             OptionDTO optionDTO = new OptionDTO();
-            optionDTO.setId(menuOption.getOptionId()); // Set option ID
-            optionDTO.setName(menuOption.getOptionDB().getName()); // Set option name
-            optionDTO.setOptionGroupId(menuOption.getOptionDB().getOptionGroupId()); // Set group ID
-            optionDTO.setSelected(true); // Mark as selected
-            return optionDTO;
-        }).collect(Collectors.toList());
-    }
+            optionDTO.setId(optionDB.getId());
+            optionDTO.setName(optionDB.getName());
 
+            boolean isSelected = false;
+            for (MenuOptionDB menuOptionDB : menuOptionDBList) {
+                if (menuOptionDB.getOptionDB().getId().equals(optionDB.getId())) {
+//                    optionDTO.setSelected(true);
+                    isSelected = true;
+                    break;
+                }
+            }
+            optionDTO.setSelected(isSelected);
+            optionDTOList.add(optionDTO);
+        }
+        menuDTO.setOptions(optionDTOList);
+        return menuDTO;
+
+    }
 
 
     @Override
@@ -261,38 +286,54 @@ public class FoodServiceImpl implements FoodService {
         MenuDB menuDB = menuRepository.findById(menuDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuDTO.getId()));
 
-        // Handle adding new options
+        // Retrieve existing menu options
+        List<MenuOptionDB> existingMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
+
+        // Process options to add or update
         if (menuDTO.getOptions() != null && !menuDTO.getOptions().isEmpty()) {
             for (OptionDTO optionDTO : menuDTO.getOptions()) {
-                OptionDB optionDB = optionRepository.findById(optionDTO.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Option not found for ID: " + optionDTO.getId()));
+                // Check if the option already exists for the menu
+                MenuOptionDB menuOptionDB = existingMenuOptions.stream()
+                        .filter(existingOption -> existingOption.getOptionDB().getId().equals(optionDTO.getId()))
+                        .findFirst()
+                        .orElse(null);
 
-                List<MenuOptionDB> menuOptions = menuOptionRepository.findByMenuIdAndOptionId(menuDTO.getId(), optionDTO.getId());
-                if (menuOptions.isEmpty()) {
-                    MenuOptionDB menuOptionDB = new MenuOptionDB();
+                if (menuOptionDB == null) {
+                    // Add new option to the menu
+                    menuOptionDB = new MenuOptionDB();
                     menuOptionDB.setMenuDB(menuDB);
+                    OptionDB optionDB = optionRepository.findById(optionDTO.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Option not found for ID: " + optionDTO.getId()));
                     menuOptionDB.setOptionDB(optionDB);
                     menuOptionRepository.save(menuOptionDB);
                 }
+
+                // Mark this option as selected
+                optionDTO.setSelected(true);
             }
         }
 
-        // Handle removing options
+        // Process options to remove
         if (menuDTO.getRemovedOptions() != null && !menuDTO.getRemovedOptions().isEmpty()) {
-            for (OptionDTO optionDTO : menuDTO.getRemovedOptions()) {
-                menuOptionRepository.deleteByMenuIdAndOptionId(menuDTO.getId(), optionDTO.getId());
+            for (OptionDTO removedOption : menuDTO.getRemovedOptions()) {
+                // Remove option from the menu
+                menuOptionRepository.deleteByMenuIdAndOptionId(menuDTO.getId(), removedOption.getId());
+
+                // Mark this option as not selected
+                removedOption.setSelected(false);
             }
         }
 
-        // Fetch updated list of options for the menu
-        List<MenuOptionDB> updatedMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
-
-        List<OptionDTO> updatedOptions = updatedMenuOptions.stream()
-                .map(mo -> {
-                    OptionDTO dto = new OptionDTO();
-                    dto.setId(mo.getOptionDB().getId());
-                    dto.setName(mo.getOptionDB().getName());
-                    return dto;
+        // Prepare response options from database to ensure fresh and correct results
+        List<OptionDTO> responseOptions = menuOptionRepository.findByMenuId(menuDTO.getId()).stream()
+                .map(menuOptionDB -> {
+                    OptionDTO optionDTO = new OptionDTO();
+                    OptionDB optionDB = menuOptionDB.getOptionDB();
+                    optionDTO.setId(optionDB.getId());
+                    optionDTO.setName(optionDB.getName());
+                    optionDTO.setOptionGroupId(optionDB.getOptionGroupId());
+                    optionDTO.setSelected(true); // These are selected options
+                    return optionDTO;
                 })
                 .collect(Collectors.toList());
 
@@ -302,10 +343,9 @@ public class FoodServiceImpl implements FoodService {
         responseDTO.setName(menuDB.getName());
         responseDTO.setDescription(menuDB.getDescription());
         responseDTO.setBasePrice(menuDB.getBasePrice());
-        responseDTO.setOptions(updatedOptions);
+        responseDTO.setOptions(responseOptions);
+        responseDTO.setRemovedOptions(menuDTO.getRemovedOptions()); // Removed options are already updated
 
-        return responseDTO; // Spring Boot converts this into JSON
+        return responseDTO; // Return response with fresh and accurate options
     }
-
-
 }

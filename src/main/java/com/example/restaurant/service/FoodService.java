@@ -2,7 +2,6 @@ package com.example.restaurant.service;
 
 import com.example.restaurant.dto.CategoryDTO;
 import com.example.restaurant.dto.MenuDTO;
-import com.example.restaurant.dto.OptionDTO;
 
 import java.util.List;
 
@@ -14,7 +13,9 @@ public interface FoodService {
 
     MenuDTO getMenuWithOptions(Long menuId);
 
-    List<OptionDTO> getMenuOptionsDetailed(Long menuId);
+    MenuDTO getMenuOptionsDetailed(Long menuId);
+
+//    MenuDTO handleMenuOptions(Long menuId);
 
     MenuDTO handleMenuOptions(MenuDTO menuDTO);
 
