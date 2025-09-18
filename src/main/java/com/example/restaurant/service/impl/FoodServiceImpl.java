@@ -240,16 +240,27 @@ public class FoodServiceImpl implements FoodService {
     @Override
     @Transactional
     public MenuDTO handleMenuOptions(MenuDTO menuDTO) {
+        System.out.println("=== DEBUG: handleMenuOptions called ===");
+        System.out.println("Menu ID: " + menuDTO.getId());
+        System.out.println("MenuOptions size: " + (menuDTO.getMenuOptions() != null ? menuDTO.getMenuOptions().size() : "null"));
+        System.out.println("RemovedOptions size: " + (menuDTO.getRemovedOptions() != null ? menuDTO.getRemovedOptions().size() : "null"));
+
         // Validate that the menu exists
         MenuDB menuDB = menuRepository.findById(menuDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuDTO.getId()));
 
+        System.out.println("Menu found: " + menuDB.getName());
+
         // Retrieve existing menu options
         List<MenuOptionDB> existingMenuOptions = menuOptionRepository.findByMenuId(menuDTO.getId());
+        System.out.println("Existing menu options count: " + existingMenuOptions.size());
 
         // Process options to add or update
         if (menuDTO.getMenuOptions() != null && !menuDTO.getMenuOptions().isEmpty()) {
+            System.out.println("Processing options to add...");
             for (OptionDTO optionDTO : menuDTO.getMenuOptions()) {
+                System.out.println("Processing option ID: " + optionDTO.getId() + ", Name: " + optionDTO.getName());
+
                 // Check if the option already exists for the menu
                 MenuOptionDB menuOptionDB = existingMenuOptions.stream()
                         .filter(existingOption -> existingOption.getOptionDB().getId().equals(optionDTO.getId()))
@@ -257,13 +268,20 @@ public class FoodServiceImpl implements FoodService {
                         .orElse(null);
 
                 if (menuOptionDB == null) {
+                    System.out.println("Option not found in existing, creating new link...");
                     // Add new option to the menu
                     menuOptionDB = new MenuOptionDB();
                     menuOptionDB.setMenuDB(menuDB);
+
                     OptionDB optionDB = optionRepository.findById(optionDTO.getId())
                             .orElseThrow(() -> new IllegalArgumentException("Option not found for ID: " + optionDTO.getId()));
+                    System.out.println("Option DB found: " + optionDB.getName());
+
                     menuOptionDB.setOptionDB(optionDB);
-                    menuOptionRepository.save(menuOptionDB);
+                    MenuOptionDB savedMenuOption = menuOptionRepository.save(menuOptionDB);
+                    System.out.println("MenuOption saved with ID: " + savedMenuOption.getId());
+                } else {
+                    System.out.println("Option already exists for this menu");
                 }
 
                 // Mark this option as selected
@@ -273,9 +291,12 @@ public class FoodServiceImpl implements FoodService {
 
         // Process options to remove
         if (menuDTO.getRemovedOptions() != null && !menuDTO.getRemovedOptions().isEmpty()) {
+            System.out.println("Processing options to remove...");
             for (OptionDTO removedOption : menuDTO.getRemovedOptions()) {
+                System.out.println("Removing option ID: " + removedOption.getId());
                 // Remove option from the menu
                 menuOptionRepository.deleteByMenuIdAndOptionId(menuDTO.getId(), removedOption.getId());
+                System.out.println("Option removed from menu");
 
                 // Mark this option as not selected
                 removedOption.setSelected(false);
@@ -295,6 +316,8 @@ public class FoodServiceImpl implements FoodService {
                 })
                 .collect(Collectors.toList());
 
+        System.out.println("Final response options count: " + responseOptions.size());
+
         // Build the response DTO
         MenuDTO responseDTO = new MenuDTO();
         responseDTO.setId(menuDB.getId());
@@ -302,9 +325,10 @@ public class FoodServiceImpl implements FoodService {
         responseDTO.setDescription(menuDB.getDescription());
         responseDTO.setBasePrice(menuDB.getBasePrice());
         responseDTO.setMenuOptions(responseOptions);
-        responseDTO.setRemovedOptions(menuDTO.getRemovedOptions()); // Removed options are already updated
+        responseDTO.setRemovedOptions(menuDTO.getRemovedOptions());
 
-        return responseDTO; // Return response with fresh and accurate options
+        System.out.println("=== DEBUG: handleMenuOptions completed ===");
+        return responseDTO;
     }
 
     @Override
