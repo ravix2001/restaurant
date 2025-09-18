@@ -9,11 +9,11 @@ import java.util.List;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OptionDTO {
+public class SizeGroupOptionGroupDTO {
 
-    private Long id;
-    private String name;
+    private Long sizeGroupOptionGroupId;
+    private Long sizeGroupId;
     private Long optionGroupId;
-    private List<SizeOptionDTO> sizes;
-    private boolean isSelected;
+//    private List<OptionDTO> options;
+    private List<SizeOptionDTO> options;
 }
