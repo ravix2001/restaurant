@@ -152,49 +152,54 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public List<CategoryDTO> getAllCategory() {
-        List<CategoryDB> categories = categoryRepository.findAll();
+
+        List<CategoryDTO> categories = categoryRepository.getAllCategories();
+
+        List<MenuDB> allMenus = menuRepository.findAll();
+
+        Map<Long, List<MenuDB>> categoryIdMenusMap = allMenus.stream()
+                .collect(Collectors.groupingBy(MenuDB::getCategoryId));
+
         List<CategoryDTO> categoryDTOList = new ArrayList<>();
 
-        for (CategoryDB category : categories) {
-            CategoryDTO categoryDTO = new CategoryDTO();
-            categoryDTO.setId(category.getId());
-            categoryDTO.setName(category.getName());
+        for (CategoryDTO category : categories) {
 
-            List<MenuDB> menus = menuRepository.findByCategoryId(category.getId());
+            List<MenuDB> menus = categoryIdMenusMap.get(category.getId());
             List<MenuDTO> menuDTOList = new ArrayList<>();
 
-            for (MenuDB menu : menus) {
-                MenuDTO menuDTO = new MenuDTO();
-                menuDTO.setId(menu.getId());
-                menuDTO.setName(menu.getName());
-                menuDTO.setBasePrice(menu.getBasePrice());
-                menuDTO.setCategoryId(category.getId());
+            if (menus != null) {
+                for (MenuDB menu : menus) {
+                    MenuDTO menuDTO = new MenuDTO();
+                    menuDTO.setId(menu.getId());
+                    menuDTO.setName(menu.getName());
+                    menuDTO.setBasePrice(menu.getBasePrice());
+                    menuDTO.setCategoryId(category.getId());
 
-                List<MenuSizeDB> menuSizeDBs = menuSizeRepository.findByMenuId(menu.getId());
-                List<MenuSizeDTO> menuSizeDTOList = new ArrayList<>();
+                    List<MenuSizeDB> menuSizeDBs = menuSizeRepository.findByMenuId(menu.getId());
+                    List<MenuSizeDTO> menuSizeDTOList = new ArrayList<>();
 
-                for (MenuSizeDB menuSizeDB : menuSizeDBs) {
-                    MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
-                    menuSizeDTO.setId(menuSizeDB.getId());
-                    menuSizeDTO.setPrice(menuSizeDB.getPrice());
-                    menuSizeDTO.setMenuId(menuSizeDB.getMenuDB().getId());
-                    menuSizeDTO.setSizeId(menuSizeDB.getSizeDB().getId());
-                    menuSizeDTOList.add(menuSizeDTO);
-                }
-
-                if (!menuSizeDBs.isEmpty()) {
-                    SizeDB firstSize = menuSizeDBs.get(0).getSizeDB();
-                    if (firstSize.getSizeGroupDB() != null) {
-                        menuDTO.setSizeGroupId(firstSize.getSizeGroupDB().getId());
+                    for (MenuSizeDB menuSizeDB : menuSizeDBs) {
+                        MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
+                        menuSizeDTO.setId(menuSizeDB.getId());
+                        menuSizeDTO.setPrice(menuSizeDB.getPrice());
+                        menuSizeDTO.setMenuId(menuSizeDB.getMenuDB().getId());
+                        menuSizeDTO.setSizeId(menuSizeDB.getSizeDB().getId());
+                        menuSizeDTOList.add(menuSizeDTO);
                     }
+
+                    if (!menuSizeDBs.isEmpty()) {
+                        SizeDB firstSize = menuSizeDBs.get(0).getSizeDB();
+                        if (firstSize.getSizeGroupDB() != null) {
+                            menuDTO.setSizeGroupId(firstSize.getSizeGroupDB().getId());
+                        }
+                    }
+
+                    menuDTO.setMenuSizes(menuSizeDTOList);
+                    menuDTOList.add(menuDTO);
                 }
-
-                menuDTO.setMenuSizes(menuSizeDTOList);
-                menuDTOList.add(menuDTO);
             }
-
-            categoryDTO.setMenus(menuDTOList);
-            categoryDTOList.add(categoryDTO);
+            category.setMenus(menuDTOList);
+            categoryDTOList.add(category);
         }
 
         return categoryDTOList;
