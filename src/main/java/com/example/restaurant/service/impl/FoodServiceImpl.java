@@ -475,7 +475,6 @@ public class FoodServiceImpl implements FoodService {
         SizeGroupOptionGroupDB sizeGroupOptionGroupDB = sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
                 .orElseThrow(() -> new RuntimeException("SizeGroupOptionGroup not found"));
 
-        // Get size + option groups
         SizeGroupDB sizeGroupDB = sizeGroupOptionGroupDB.getSizeGroupDB();
         OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
 

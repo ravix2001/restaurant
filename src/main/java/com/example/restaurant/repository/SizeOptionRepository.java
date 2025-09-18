@@ -1,5 +1,6 @@
 package com.example.restaurant.repository;
 
+import com.example.restaurant.dto.SizeOptionDTO;
 import com.example.restaurant.entity.SizeOptionDB;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,7 +10,9 @@ public interface SizeOptionRepository extends JpaRepository<SizeOptionDB, Long> 
 
     List<SizeOptionDB> findBySizeGroupOptionGroupId(Long sizeGroupOptionGroupId);
 
-    SizeOptionDB findBySizeGroupOptionGroupIdAndOptionDBIdAndSizeDBId(Long id, Long id1, Long id2);
+    List<SizeOptionDTO> findByOptionId(Long id);
+
+//    SizeOptionDB findBySizeGroupOptionGroupIdAndOptionDBIdAndSizeDBId(Long id, Long id1, Long id2);
 
 //    SizeOptionDB findBySizeGroupOptionGroupIdAndOptionDB_IdAndSizeDB_Id(
 //            Long sizeGroupOptionGroupId,

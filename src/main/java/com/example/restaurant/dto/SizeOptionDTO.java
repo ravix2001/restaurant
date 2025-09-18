@@ -14,6 +14,8 @@ public class SizeOptionDTO {
 
     private Long id;
     private BigDecimal price;
+    private Long sizeId;
+    private Long optionId;
     private List<SizeOptionDTO> sizes;
 
 }

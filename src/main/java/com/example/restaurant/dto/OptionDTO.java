@@ -16,4 +16,5 @@ public class OptionDTO {
     private Long optionGroupId;
     private List<SizeOptionDTO> sizes;
     private boolean isSelected;
+    private List<OptionDTO> options;
 }
