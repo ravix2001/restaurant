@@ -21,13 +21,12 @@ public class MenuDTO {
 
     private List<MenuSizeDTO> menuSizes;
 
-    // Add this field to include sizes in the response
     private List<SizeDTO> sizes;
 
-    // Add this field to include optionGroups
+    private List<OptionDTO> menuOptions;
+
     private List<OptionGroupDTO> optionGroups;
 
-    private List<OptionDTO> menuOptions;
     private List<OptionDTO> removedOptions;
 
 

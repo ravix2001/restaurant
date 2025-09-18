@@ -1,9 +1,6 @@
 package com.example.restaurant.controller;
 
-import com.example.restaurant.dto.CategoryDTO;
-import com.example.restaurant.dto.MenuDTO;
-import com.example.restaurant.dto.OptionDTO;
-import com.example.restaurant.dto.SizeOptionGroupDTO;
+import com.example.restaurant.dto.*;
 import com.example.restaurant.service.FoodService;
 import com.example.restaurant.service.SizeOptionGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/food")
@@ -79,4 +76,40 @@ public class FoodController {
         MenuDTO updatedMenuDTO = foodService.handleMenuOptionsDetailed(menuDTO);
         return ResponseEntity.ok(updatedMenuDTO);
     }
+
+//    @GetMapping("/extraPrices/{sizeGroupOptionGroupId}")
+//    public ResponseEntity<Map<String, Object>> getExtraPrices(@PathVariable Long sizeGroupOptionGroupId) {
+//        Map<String, Object> response = foodService.getExtraPrices(sizeGroupOptionGroupId);
+//        return ResponseEntity.ok(response);
+//    }
+
+    @GetMapping("/extraPrices/{sizeGroupOptionGroupId}")
+    public ResponseEntity<SizeGroupOptionGroupDTO> getExtraPrices(@PathVariable Long sizeGroupOptionGroupId) {
+        SizeGroupOptionGroupDTO response = foodService.getExtraPrices(sizeGroupOptionGroupId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/extraPrices")
+    public ResponseEntity<SizeGroupOptionGroupDTO> handleExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
+        SizeGroupOptionGroupDTO response = foodService.handleExtraPrices(request);
+        return ResponseEntity.ok(response);
+    }
+
+//    @PostMapping("/extraPrices")
+//    public ResponseEntity<String> handleExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
+//        String response = foodService.handleExtraPrices(request);
+//        return ResponseEntity.ok(response);
+//    }
+
+//    @PostMapping("/extraPrices")
+//    public ResponseEntity<Map<String, Object>> handleExtraPrices(@RequestBody Map<String, Object> request) {
+//        Map<String, Object> response = foodService.handleExtraPrices(request);
+//        return ResponseEntity.ok(response);
+//    }
+
+//    @PostMapping("/extraPrices")
+//    public ResponseEntity<String> saveExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
+//        foodService.handleExtraPrices(request);
+//        return ResponseEntity.ok("Extra prices saved successfully");
+//    }
 }
