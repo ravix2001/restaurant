@@ -280,6 +280,127 @@ public class PublicServiceImpl implements PublicService {
 //        }).collect(Collectors.toList());
 //    }
 
+//    @Override
+//    public MenuDTO getMenuInfo(Long menuId) {
+//
+//        MenuDB menuDB = menuRepository.findById(menuId)
+//                .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuId));
+//
+//        // Fetch sizes and prices
+//        List<SizeDTO> sizeDTOs = Optional.ofNullable(menuDB.getSizeGroup())
+//                .map(sizeGroup -> {
+//                    List<SizeDB> sizes = sizeRepository.findBySizeGroupId(sizeGroup.getId());
+//                    List<MenuSizeDB> menuSizes = menuSizeRepository.findByMenuId(menuId);
+//
+//                    return sizes.stream()
+//                            .map(sizeDB -> {
+//                                SizeDTO sizeDTO = new SizeDTO();
+//                                sizeDTO.setId(sizeDB.getId());
+//                                sizeDTO.setName(sizeDB.getName());
+//
+//                                // Find price from MenuSizeDB
+//                                BigDecimal price = menuSizes.stream()
+//                                        .filter(menuSizeDB -> menuSizeDB.getSizeId().equals(sizeDB.getId()))
+//                                        .map(MenuSizeDB::getPrice)
+//                                        .findFirst()
+//                                        .orElse(BigDecimal.ZERO);
+//
+//                                sizeDTO.setPrice(price);
+//                                return sizeDTO;
+//                            })
+//                            .collect(Collectors.toList());
+//                })
+//                .orElse(Collections.emptyList());
+//
+//        // Fetch selected menu options and their nested options
+//        List<MenuOptionDB> selectedMenuOptions = menuOptionRepository.findByMenuId(menuId);
+//
+//        List<OptionDTO> menuOptions = selectedMenuOptions.stream()
+//                .map(menuOptionDB -> {
+//                    OptionDTO menuOptionDTO = new OptionDTO();
+//                    menuOptionDTO.setId(menuOptionDB.getOptionId());
+//                    menuOptionDTO.setName(menuOptionDB.getOptionDB().getName());
+//
+//                    // Fetch nested options
+//                    List<OptionDTO> nestedOptions = optionRepository.findByOptionGroupId(menuOptionDB.getOptionDB().getOptionGroupId())
+//                            .stream()
+//                            .map(optionDB -> {
+//                                OptionDTO optionDTO = new OptionDTO();
+//                                optionDTO.setId(optionDB.getId());
+//                                optionDTO.setName(optionDB.getName());
+//
+//                                // Fetch size-prices for each nested option
+//                                List<SizeOptionDTO> sizePrices = sizeOptionRepository.findByOptionId(optionDB.getId())
+//                                        .stream()
+//                                        .map(sizeOptionDB -> {
+//                                            SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
+//                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId());
+//                                            sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
+//                                            return sizeOptionDTO;
+//                                        })
+//                                        .collect(Collectors.toList());
+//
+//                                optionDTO.setSizes(sizePrices);
+//                                return optionDTO;
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    menuOptionDTO.setOptions(nestedOptions);
+//                    return menuOptionDTO;
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Fetch option groups and their nested options
+//        List<OptionGroupDTO> optionGroupDTOs = Optional.ofNullable(menuDB.getSizeGroup())
+//                .map(sizeGroup -> sizeGroupOptionGroupRepository.findBySizeGroupId(sizeGroup.getId()))
+//                .orElse(Collections.emptyList())
+//                .stream()
+//                .map(sizeGroupOptionGroupDB -> {
+//                    OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
+//                    List<OptionDTO> optionDTOs = optionGroupDB.getOptions()
+//                            .stream()
+//                            .map(optionDB -> {
+//                                OptionDTO optionDTO = new OptionDTO();
+//                                optionDTO.setId(optionDB.getId());
+//                                optionDTO.setName(optionDB.getName());
+//
+//                                // Fetch size-prices for each option
+//                                List<SizeOptionDTO> sizePrices = sizeOptionRepository.findByOptionId(optionDB.getId())
+//                                        .stream()
+//                                        .map(sizeOptionDB -> {
+//                                            SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
+//                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId());
+//                                            sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
+//                                            return sizeOptionDTO;
+//                                        })
+//                                        .collect(Collectors.toList());
+//
+//                                optionDTO.setSizes(sizePrices);
+//                                return optionDTO;
+//                            })
+//                            .collect(Collectors.toList());
+//
+//                    OptionGroupDTO optionGroupDTO = new OptionGroupDTO();
+//                    optionGroupDTO.setId(optionGroupDB.getId());
+//                    optionGroupDTO.setName(optionGroupDB.getName());
+//                    optionGroupDTO.setOptions(optionDTOs);
+//
+//                    return optionGroupDTO;
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Construct the final MenuDTO
+//        MenuDTO menuDTO = new MenuDTO();
+//        menuDTO.setId(menuDB.getId());
+//        menuDTO.setName(menuDB.getName());
+//        menuDTO.setBasePrice(menuDB.getBasePrice());
+//        menuDTO.setSizes(sizeDTOs);
+//        menuDTO.setMenuOptions(menuOptions);
+//        menuDTO.setOptionGroups(optionGroupDTOs);
+//
+//        return menuDTO;
+//    }
+
     @Override
     public MenuDTO getMenuInfo(Long menuId) {
 
@@ -318,10 +439,11 @@ public class PublicServiceImpl implements PublicService {
         List<OptionDTO> menuOptions = selectedMenuOptions.stream()
                 .map(menuOptionDB -> {
                     OptionDTO menuOptionDTO = new OptionDTO();
-                    menuOptionDTO.setId(menuOptionDB.getOptionId());
-                    menuOptionDTO.setName(menuOptionDB.getOptionDB().getName());
+                    // Map to match the expected response structure
+                    menuOptionDTO.setName(menuOptionDB.getOptionDB().getName());  // "tomato"
+                    menuOptionDTO.setOptionId(menuOptionDB.getOptionId());        // optionId: 2
 
-                    // Fetch nested options
+                    // Fetch nested options from the same option group
                     List<OptionDTO> nestedOptions = optionRepository.findByOptionGroupId(menuOptionDB.getOptionDB().getOptionGroupId())
                             .stream()
                             .map(optionDB -> {
@@ -334,7 +456,7 @@ public class PublicServiceImpl implements PublicService {
                                         .stream()
                                         .map(sizeOptionDB -> {
                                             SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
-                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId());
+                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId()); // Size ID
                                             sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
                                             return sizeOptionDTO;
                                         })
@@ -345,7 +467,7 @@ public class PublicServiceImpl implements PublicService {
                             })
                             .collect(Collectors.toList());
 
-                    menuOptionDTO.setOptions(nestedOptions);
+                    menuOptionDTO.setOptions(nestedOptions);  // This should be "options" in response
                     return menuOptionDTO;
                 })
                 .collect(Collectors.toList());
@@ -364,12 +486,13 @@ public class PublicServiceImpl implements PublicService {
                                 optionDTO.setId(optionDB.getId());
                                 optionDTO.setName(optionDB.getName());
 
-                                // Fetch size-prices for each option
-                                List<SizeOptionDTO> sizePrices = sizeOptionRepository.findByOptionId(optionDB.getId())
+                                // Fetch size-prices for each option - filter by sizeGroupOptionGroup
+                                List<SizeOptionDTO> sizePrices = sizeOptionRepository.findBySizeGroupOptionGroupId(sizeGroupOptionGroupDB.getId())
                                         .stream()
+                                        .filter(sizeOptionDB -> sizeOptionDB.getOptionId().equals(optionDB.getId()))
                                         .map(sizeOptionDB -> {
                                             SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
-                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId());
+                                            sizeOptionDTO.setId(sizeOptionDB.getSizeId()); // Size ID
                                             sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
                                             return sizeOptionDTO;
                                         })
@@ -395,116 +518,11 @@ public class PublicServiceImpl implements PublicService {
         menuDTO.setName(menuDB.getName());
         menuDTO.setBasePrice(menuDB.getBasePrice());
         menuDTO.setSizes(sizeDTOs);
-        menuDTO.setMenuOptions(menuOptions);
+        menuDTO.setMenuOptions(menuOptions);  // This maps to "menuOptions" in response
         menuDTO.setOptionGroups(optionGroupDTOs);
 
         return menuDTO;
     }
-//    @Override
-//    public MenuDTO getMenuInfo(Long menuId) {
-//        // Validate the menu exists
-//        MenuDB menuDB = menuRepository.findById(menuId)
-//                .orElseThrow(() -> new IllegalArgumentException("Menu not found for ID: " + menuId));
-//
-//        List<SizeDTO> sizeDTOs = Optional.ofNullable(menuDB.getSizeGroup())
-//                .map(sizeGroup -> sizeRepository.findBySizeGroupId(sizeGroup.getId()))
-//                .orElse(Collections.emptyList())
-//                .stream()
-//                .map(sizeDB -> {
-//                    SizeDTO sizeDTO = new SizeDTO();
-//                    sizeDTO.setId(sizeDB.getId());
-//                    sizeDTO.setName(sizeDB.getName());
-//                    // attach price (default or from DB mapping)
-//                    sizeDTO.setPrice(BigDecimal.ZERO);
-//                    return sizeDTO;
-//                })
-//                .collect(Collectors.toList());
-//
-//        List<MenuOptionDB> selectedMenuOptions = menuOptionRepository.findByMenuId(menuId);
-//
-//        List<OptionDTO> menuOptions = selectedMenuOptions.stream()
-//                .map(menuOptionDB -> {
-//                    OptionDTO menuOptionDTO = new OptionDTO();
-//                    menuOptionDTO.setId(menuOptionDB.getId());
-//                    menuOptionDTO.setName(menuOptionDB.getOptionDB().getName());
-//
-//                    // Now fetch nested options inside this menuOption
-//                    List<OptionDTO> nestedOptions = optionRepository.findByOptionGroupId(menuOptionDB.getOptionDB().getOptionGroupId())
-//                            .stream()
-//                            .map(optionDB -> {
-//                                OptionDTO optionDTO = new OptionDTO();
-//                                optionDTO.setId(optionDB.getId());
-//                                optionDTO.setName(optionDB.getName());
-//
-//                                // Fetch size-prices for this option
-//                                List<SizeOptionDTO> optionSizes = sizeOptionRepository.findByOptionId(optionDB.getId())
-//                                        .stream()
-//                                        .map(sizeOptionDB -> {
-//                                            SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
-//                                            sizeOptionDTO.setId(sizeOptionDB.getSizeDB().getId());
-//                                            sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
-//                                            return sizeOptionDTO;
-//                                        })
-//                                        .collect(Collectors.toList());
-//
-//                                optionDTO.setSizes(optionSizes);
-//                                return optionDTO;
-//                            })
-//                            .collect(Collectors.toList());
-//
-//                    menuOptionDTO.setOptions(nestedOptions);
-//                    return menuOptionDTO;
-//                })
-//                .collect(Collectors.toList());
-//
-//        List<OptionGroupDTO> optionGroupDTOs = Optional.ofNullable(menuDB.getSizeGroup())
-//                .map(sizeGroup -> sizeGroupOptionGroupRepository.findBySizeGroupId(sizeGroup.getId()))
-//                .orElse(Collections.emptyList())
-//                .stream()
-//                .map(sizeGroupOptionGroupDB -> {
-//                    OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
-//
-//                    List<OptionDTO> optionDTOs = optionGroupDB.getOptions()
-//                            .stream()
-//                            .map(optionDB -> {
-//                                OptionDTO optionDTO = new OptionDTO();
-//                                optionDTO.setId(optionDB.getId());
-//                                optionDTO.setName(optionDB.getName());
-//
-//                                // Fetch size-prices for this option
-//                                List<SizeOptionDTO> optionSizes = sizeOptionRepository.findByOptionId(optionDB.getId())
-//                                        .stream()
-//                                        .map(sizeOptionDB -> {
-//                                            SizeOptionDTO sizeOptionDTO = new SizeOptionDTO();
-//                                            sizeOptionDTO.setId(sizeOptionDB.getSizeDB().getId());
-//                                            sizeOptionDTO.setPrice(sizeOptionDB.getPrice());
-//                                            return sizeOptionDTO;
-//                                        })
-//                                        .collect(Collectors.toList());
-//
-//                                optionDTO.setSizes(optionSizes);
-//                                return optionDTO;
-//                            })
-//                            .collect(Collectors.toList());
-//
-//                    OptionGroupDTO optionGroupDTO = new OptionGroupDTO();
-//                    optionGroupDTO.setId(optionGroupDB.getId());
-//                    optionGroupDTO.setName(optionGroupDB.getName());
-//                    optionGroupDTO.setOptions(optionDTOs);
-//
-//                    return optionGroupDTO;
-//                })
-//                .collect(Collectors.toList());
-//
-//        MenuDTO menuDTO = new MenuDTO();
-//        menuDTO.setId(menuDB.getId());
-//        menuDTO.setName(menuDB.getName());
-//        menuDTO.setBasePrice(menuDB.getBasePrice());
-//        menuDTO.setSizes(sizeDTOs);
-//        menuDTO.setMenuOptions(menuOptions);
-//        menuDTO.setOptionGroups(optionGroupDTOs);
-//
-//        return menuDTO;
-//    }
+
 
 }

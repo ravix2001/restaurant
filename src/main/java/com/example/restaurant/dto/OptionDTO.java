@@ -13,6 +13,7 @@ public class OptionDTO {
 
     private Long id;
     private String name;
+    private Long optionId;
     private Long optionGroupId;
     private List<SizeOptionDTO> sizes;
     private boolean isSelected;
