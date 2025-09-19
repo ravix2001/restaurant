@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface OptionGroupService {
 
-    OptionGroupDB create(OptionGroupDTO optionGroupDTO);
-    OptionGroupDB update(OptionGroupDTO optionGroupDTO);
+    OptionGroupDTO create(OptionGroupDTO optionGroupDTO);
+    OptionGroupDTO update(OptionGroupDTO optionGroupDTO);
     void delete(Long id);
-    List<OptionGroupDB> findAll();
-    OptionGroupDB getById(Long id);
+    List<OptionGroupDTO> findAll();
+    OptionGroupDTO getById(Long id);
 
 }

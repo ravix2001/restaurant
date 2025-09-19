@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface SizeService {
 
-//    SizeDB create(SizeDTO sizeDTO);
     SizeDB update(SizeDTO sizeDTO);
     void delete(Long id);
     List<SizeDB> findBySizeGroup(Long sizeGroupId);

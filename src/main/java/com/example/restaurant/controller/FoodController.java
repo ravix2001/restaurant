@@ -77,12 +77,6 @@ public class FoodController {
         return ResponseEntity.ok(updatedMenuDTO);
     }
 
-//    @GetMapping("/extraPrices/{sizeGroupOptionGroupId}")
-//    public ResponseEntity<Map<String, Object>> getExtraPrices(@PathVariable Long sizeGroupOptionGroupId) {
-//        Map<String, Object> response = foodService.getExtraPrices(sizeGroupOptionGroupId);
-//        return ResponseEntity.ok(response);
-//    }
-
     @GetMapping("/extraPrices/{sizeGroupOptionGroupId}")
     public ResponseEntity<SizeGroupOptionGroupDTO> getExtraPrices(@PathVariable Long sizeGroupOptionGroupId) {
         SizeGroupOptionGroupDTO response = foodService.getExtraPrices(sizeGroupOptionGroupId);
@@ -95,21 +89,4 @@ public class FoodController {
         return ResponseEntity.ok(response);
     }
 
-//    @PostMapping("/extraPrices")
-//    public ResponseEntity<String> handleExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
-//        String response = foodService.handleExtraPrices(request);
-//        return ResponseEntity.ok(response);
-//    }
-
-//    @PostMapping("/extraPrices")
-//    public ResponseEntity<Map<String, Object>> handleExtraPrices(@RequestBody Map<String, Object> request) {
-//        Map<String, Object> response = foodService.handleExtraPrices(request);
-//        return ResponseEntity.ok(response);
-//    }
-
-//    @PostMapping("/extraPrices")
-//    public ResponseEntity<String> saveExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
-//        foodService.handleExtraPrices(request);
-//        return ResponseEntity.ok("Extra prices saved successfully");
-//    }
 }

@@ -9,11 +9,7 @@ public interface MenuOptionRepository extends JpaRepository<MenuOptionDB, Long> 
 
     List<MenuOptionDB> findByMenuId(Long menuId);
 
-    List<MenuOptionDB> findByMenuIdAndOptionId(Long menuId, Long optionId);
-
     void deleteByMenuIdAndOptionId(Long menuId, Long optionId);
-
-    List<MenuOptionDB> findAllByMenuId(Long menuId);
 
     MenuOptionDB findByOptionId(Long optionId);
 }

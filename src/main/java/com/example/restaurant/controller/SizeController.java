@@ -3,6 +3,7 @@ package com.example.restaurant.controller;
 import com.example.restaurant.dto.SizeDTO;
 import com.example.restaurant.entity.SizeDB;
 import com.example.restaurant.service.SizeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +13,8 @@ import java.util.List;
 @RequestMapping("/api/size")
 public class SizeController {
 
-    private final SizeService sizeService;
-
-    public SizeController(SizeService sizeService) { this.sizeService = sizeService; }
+    @Autowired
+    private SizeService sizeService;
 
     @GetMapping("/{id}")
     public ResponseEntity<SizeDB> get(@PathVariable Long id) { return ResponseEntity.ok(sizeService.getById(id)); }
@@ -24,4 +24,5 @@ public class SizeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) { sizeService.delete(id); return ResponseEntity.noContent().build(); }
+
 }

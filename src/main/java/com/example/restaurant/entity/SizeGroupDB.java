@@ -16,10 +16,6 @@ public class SizeGroupDB {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 120)
     private String name;
-
-    @OneToMany(mappedBy = "sizeGroupDB", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SizeDB> sizes;
 
 }

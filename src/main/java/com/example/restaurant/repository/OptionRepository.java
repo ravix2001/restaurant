@@ -9,4 +9,5 @@ public interface OptionRepository extends JpaRepository<OptionDB, Long> {
 
     List<OptionDB> findByOptionGroupId(Long optionGroupId);
 
+    void deleteByOptionGroupId(Long optionGroupId);
 }

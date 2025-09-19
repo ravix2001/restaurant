@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface SizeGroupService {
 
-    SizeGroupDB create(SizeGroupDTO sizeGroupDTO);
-    SizeGroupDB update(SizeGroupDTO sizeGroupDTO);
+    SizeGroupDTO create(SizeGroupDTO sizeGroupDTO);
+    SizeGroupDTO update(SizeGroupDTO sizeGroupDTO);
     void delete(Long id);
-    List<SizeGroupDB> findAll();
-    SizeGroupDB getById(Long id);
+    List<SizeGroupDTO> findAll();
+    SizeGroupDTO getById(Long id);
 
 }

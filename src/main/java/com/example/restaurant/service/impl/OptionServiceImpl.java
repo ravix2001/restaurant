@@ -4,16 +4,14 @@ import com.example.restaurant.dto.OptionDTO;
 import com.example.restaurant.entity.OptionDB;
 import com.example.restaurant.repository.OptionRepository;
 import com.example.restaurant.service.OptionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@Service
 public class OptionServiceImpl implements OptionService {
 
-    private final OptionRepository optionRepository;
-
-    public OptionServiceImpl(OptionRepository optionRepository) {
-        this.optionRepository = optionRepository;
-    }
+    @Autowired
+    private OptionRepository optionRepository;
 
     @Override
     public OptionDB update(OptionDTO optionDTO) {
@@ -26,11 +24,6 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public void delete(Long id) {
         optionRepository.deleteById(id);
-    }
-
-    @Override
-    public List<OptionDB> findByOptionGroup(Long optionGroupId) {
-        return optionRepository.findByOptionGroupId(optionGroupId);
     }
 
     @Override

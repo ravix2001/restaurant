@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface SizeGroupOptionGroupRepository extends JpaRepository<SizeGroupOptionGroupDB, Long> {
 
-    void deleteBySizeGroupIdAndOptionGroupId(Long sizeGroupId, Long optionGroupId);
-
     List<SizeGroupOptionGroupDB> findBySizeGroupId(Long sizeGroupId);
 }

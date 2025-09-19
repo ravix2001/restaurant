@@ -3,6 +3,7 @@ package com.example.restaurant.controller;
 import com.example.restaurant.dto.CategoryDTO;
 import com.example.restaurant.entity.CategoryDB;
 import com.example.restaurant.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,12 +13,11 @@ import java.util.List;
 @RequestMapping("/api/category")
 public class CategoryController {
 
-    private final CategoryService categoryService;
-
-    public CategoryController(CategoryService categoryService) { this.categoryService = categoryService; }
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDB> list() { return categoryService.getAll(); }
+    public List<CategoryDB> getAll() { return categoryService.getAll(); }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDB> get(@PathVariable Long id) {

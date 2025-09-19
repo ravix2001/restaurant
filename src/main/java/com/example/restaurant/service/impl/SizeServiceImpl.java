@@ -2,10 +2,9 @@ package com.example.restaurant.service.impl;
 
 import com.example.restaurant.dto.SizeDTO;
 import com.example.restaurant.entity.SizeDB;
-import com.example.restaurant.entity.SizeGroupDB;
-import com.example.restaurant.repository.SizeGroupRepository;
 import com.example.restaurant.repository.SizeRepository;
 import com.example.restaurant.service.SizeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +12,8 @@ import java.util.List;
 @Service
 public class SizeServiceImpl implements SizeService {
 
-    private final SizeRepository sizeRepository;
-    private final SizeGroupRepository sizeGroupRepository;
-
-    public SizeServiceImpl(SizeRepository sizeRepository, SizeGroupRepository sizeGroupRepository) {
-        this.sizeRepository = sizeRepository;
-        this.sizeGroupRepository = sizeGroupRepository;
-    }
+    @Autowired
+    private SizeRepository sizeRepository;
 
     @Override
     public SizeDB update(SizeDTO sizeDTO) {
