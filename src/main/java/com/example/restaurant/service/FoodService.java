@@ -23,15 +23,8 @@ public interface FoodService {
 
     List<CategoryDTO> getAllCategory();
 
-//    Map<String, Object> getExtraPrices(Long sizeGroupOptionGroupId);
-
     SizeGroupOptionGroupDTO getExtraPrices(Long sizeGroupOptionGroupId);
 
     SizeGroupOptionGroupDTO handleExtraPrices(SizeGroupOptionGroupDTO options);
 
-//    String handleExtraPrices(SizeGroupOptionGroupDTO options);
-
-//    List<OptionDTO> getExtraPrices(Long sizeGroupOptionGroupId);
-
-//    void handleExtraPrices(SizeGroupOptionGroupDTO options);
 }

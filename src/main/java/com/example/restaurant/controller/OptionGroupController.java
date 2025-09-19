@@ -17,23 +17,23 @@ public class OptionGroupController {
     public OptionGroupService optionGroupService;
 
     @PostMapping
-    public ResponseEntity<OptionGroupDB> create(@RequestBody OptionGroupDTO optionGroupDTO) {
+    public ResponseEntity<OptionGroupDTO> create(@RequestBody OptionGroupDTO optionGroupDTO) {
         return ResponseEntity.ok(optionGroupService.create(optionGroupDTO));
     }
 
+    @PutMapping
+    public ResponseEntity<OptionGroupDTO> update(@RequestBody OptionGroupDTO optionGroupDTO) {
+        return ResponseEntity.ok(optionGroupService.update(optionGroupDTO));
+    }
+
     @GetMapping
-    public ResponseEntity<List<OptionGroupDB>> getAll() {
+    public ResponseEntity<List<OptionGroupDTO>> getAll() {
         return ResponseEntity.ok(optionGroupService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OptionGroupDB> get(@PathVariable Long id) { 
+    public ResponseEntity<OptionGroupDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(optionGroupService.getById(id)); 
-    }
-
-    @PutMapping
-    public ResponseEntity<OptionGroupDB> update(@RequestBody OptionGroupDTO optionGroupDTO) { 
-        return ResponseEntity.ok(optionGroupService.update(optionGroupDTO)); 
     }
 
     @DeleteMapping("/{id}")

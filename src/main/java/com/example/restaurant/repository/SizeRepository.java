@@ -9,4 +9,5 @@ public interface SizeRepository extends JpaRepository<SizeDB, Long> {
 
     List<SizeDB> findBySizeGroupId(Long sizeGroupId);
 
+    void deleteBySizeGroupId(Long sizeGroupId);
 }

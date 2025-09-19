@@ -4,6 +4,7 @@ import com.example.restaurant.dto.CategoryDTO;
 import com.example.restaurant.entity.CategoryDB;
 import com.example.restaurant.repository.CategoryRepository;
 import com.example.restaurant.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,11 +12,8 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    private final CategoryRepository categoryRepository;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository ;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public CategoryDB create(CategoryDTO categoryDTO) {
