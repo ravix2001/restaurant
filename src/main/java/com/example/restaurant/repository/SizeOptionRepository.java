@@ -12,12 +12,5 @@ public interface SizeOptionRepository extends JpaRepository<SizeOptionDB, Long> 
 
     List<SizeOptionDTO> findByOptionId(Long id);
 
-//    SizeOptionDB findBySizeGroupOptionGroupIdAndOptionDBIdAndSizeDBId(Long id, Long id1, Long id2);
-
-//    SizeOptionDB findBySizeGroupOptionGroupIdAndOptionDB_IdAndSizeDB_Id(
-//            Long sizeGroupOptionGroupId,
-//            Long optionDBId,
-//            Long sizeDBId
-//    );
 }
 

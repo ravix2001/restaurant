@@ -12,7 +12,11 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Transactional
+@Slf4j
 public class FoodServiceImpl implements FoodService {
 
     @Autowired
@@ -35,9 +39,6 @@ public class FoodServiceImpl implements FoodService {
 
     @Autowired
     private MenuOptionRepository menuOptionRepository;
-
-    @Autowired
-    private OptionGroupRepository optionGroupRepository;
 
     @Autowired
     private SizeGroupOptionGroupRepository sizeGroupOptionGroupRepository;
@@ -410,64 +411,6 @@ public class FoodServiceImpl implements FoodService {
 
     // Thursday
 
-    /**
-     *
-     * Using Map
-     *
-     */
-//    @Override
-//    public Map<String, Object> getExtraPrices(Long sizeGroupOptionGroupId) {
-//        // Get the SizeGroupOptionGroup entity
-//        SizeGroupOptionGroupDB sizeGroupOptionGroupDB = sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
-//                .orElseThrow(() -> new RuntimeException("SizeGroupOptionGroup not found"));
-//
-//        // Get all SizeOption records for this sizeGroupOptionGroupId
-//        List<SizeOptionDB> sizeOptions = sizeOptionRepository.findBySizeGroupOptionGroupId(sizeGroupOptionGroupId);
-//
-//        // Get the size group and option group
-//        SizeGroupDB sizeGroupDB = sizeGroupOptionGroupDB.getSizeGroupDB();
-//        OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
-//
-//        // Get all sizes from the size group
-//        List<SizeDB> sizes = sizeRepository.findBySizeGroupId(sizeGroupDB.getId());
-//
-//        // Get all options from the option group
-//        List<OptionDB> options = optionRepository.findByOptionGroupId(optionGroupDB.getId());
-//
-//        // Build the response using SizeOptionDTO
-//        List<SizeOptionDTO> optionsList = new ArrayList<>();
-//
-//        for (OptionDB option : options) {
-//            SizeOptionDTO optionDTO = new SizeOptionDTO();
-//            optionDTO.setId(option.getId());
-//
-//            List<SizeOptionDTO> sizesList = new ArrayList<>();
-//
-//            for (SizeDB size : sizes) {
-//                SizeOptionDTO sizeDTO = new SizeOptionDTO();
-//                sizeDTO.setId(size.getId());
-//
-//                // Find the price from sizeOptions
-//                BigDecimal price = BigDecimal.ZERO;
-//                if (!sizeOptions.isEmpty()) {
-//                    // Use the price from the first SizeOptionDB record
-//                    price = sizeOptions.get(0).getPrice();
-//                }
-//
-//                sizeDTO.setPrice(price);
-//                sizesList.add(sizeDTO);
-//            }
-//
-//            optionDTO.setSizes(sizesList);
-//            optionsList.add(optionDTO);
-//        }
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("options", optionsList);
-//
-//        return response;
-//    }
-
     @Override
     public SizeGroupOptionGroupDTO getExtraPrices(Long sizeGroupOptionGroupId) {
 
@@ -518,81 +461,68 @@ public class FoodServiceImpl implements FoodService {
         return response;
     }
 
-//    @Override
-//    public String handleExtraPrices(SizeGroupOptionGroupDTO request) {
-//
-//        Long sizeGroupOptionGroupId = request.getSizeGroupOptionGroupId();
-//
-//        // Get the SizeGroupOptionGroup entity
-//        SizeGroupOptionGroupDB sizeGroupOptionGroupDB = sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
-//                .orElseThrow(() -> new RuntimeException("SizeGroupOptionGroup not found"));
-//
-//        // Get all SizeOption records for this sizeGroupOptionGroupId
-//        List<SizeOptionDB> sizeOptions = sizeOptionRepository.findBySizeGroupOptionGroupId(sizeGroupOptionGroupId);
-//
-//        // Get the size group and option group
-//        SizeGroupDB sizeGroupDB = sizeGroupOptionGroupDB.getSizeGroupDB();
-//        OptionGroupDB optionGroupDB = sizeGroupOptionGroupDB.getOptionGroupDB();
-//
-//        // Get all sizes from the size group
-//        List<SizeDB> sizes = sizeRepository.findBySizeGroupId(sizeGroupDB.getId());
-//
-//        // Get all options from the option group
-//        List<OptionDB> options = optionRepository.findByOptionGroupId(optionGroupDB.getId());
-//
-//        // Build the response using SizeOptionDTO
-//        List<SizeOptionDTO> optionsList = new ArrayList<>();
-//
-//        for (OptionDB option : options) {
-//            SizeOptionDTO optionDTO = new SizeOptionDTO();
-//            optionDTO.setId(option.getId());
-//
-//            List<SizeOptionDTO> sizesList = new ArrayList<>();
-//
-//            for (SizeDB size : sizes) {
-//                SizeOptionDTO sizeDTO = new SizeOptionDTO();
-//                sizeDTO.setId(size.getId());
-//
-//                // Find price for this (size, option) pair
-//                BigDecimal price = sizeOptions.stream()
-//                        .filter(so -> so.getSizeDB().getId().equals(size.getId())
-//                                && so.getOptionDB().getId().equals(option.getId()))
-//                        .map(SizeOptionDB::getPrice)
-//                        .findFirst()
-//                        .orElse(BigDecimal.ZERO);
-//
-//                sizeDTO.setPrice(price);
-//                sizesList.add(sizeDTO);
-//            }
-//
-//            optionDTO.setSizes(sizesList);
-//            optionsList.add(optionDTO);
-//        }
-//
-//        return "Success";
-//    }
-
     @Override
+    @Transactional
     public SizeGroupOptionGroupDTO handleExtraPrices(SizeGroupOptionGroupDTO request) {
 
         Long sizeGroupOptionGroupId = request.getSizeGroupOptionGroupId();
 
-        // Validate if group exists (optional safety check)
-        sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
+        SizeGroupOptionGroupDB sizeGroupOptionGroup = sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
                 .orElseThrow(() -> new RuntimeException("SizeGroupOptionGroup not found"));
 
-        // Take prices directly from request body
         List<SizeOptionDTO> optionsList = new ArrayList<>();
 
         for (SizeOptionDTO optionFromRequest : request.getOptions()) {
+            Long optionId = optionFromRequest.getId(); // This is the Option ID
+            System.out.println("Processing option with ID: " + optionId);
+
             SizeOptionDTO optionDTO = new SizeOptionDTO();
-            optionDTO.setId(optionFromRequest.getId());
+            optionDTO.setId(optionId);
 
             List<SizeOptionDTO> sizesList = new ArrayList<>();
             for (SizeOptionDTO sizeFromRequest : optionFromRequest.getSizes()) {
+                Long sizeId = sizeFromRequest.getId(); // This is the Size ID
+                BigDecimal price = sizeFromRequest.getPrice();
+
+                System.out.println("Creating SizeOption: SizeId=" + sizeId +
+                        ", OptionId=" + optionId +
+                        ", Price=" + price +
+                        ", SizeGroupOptionGroupId=" + sizeGroupOptionGroupId);
+
+                // Create new SizeOptionDB entity
+                SizeOptionDB newSizeOption = new SizeOptionDB();
+
+                // Set price
+                newSizeOption.setPrice(price);
+
+                newSizeOption.setSizeId(sizeId);
+                newSizeOption.setOptionId(optionId);
+                newSizeOption.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+
+                newSizeOption.setSizeGroupOptionGroupDB(sizeGroupOptionGroup);
+
+                // Optionally set SizeDB and OptionDB references
+                if (sizeRepository != null) {
+                    SizeDB sizeDB = sizeRepository.findById(sizeId)
+                            .orElseThrow(() -> new RuntimeException("Size not found with id: " + sizeId));
+                    newSizeOption.setSizeDB(sizeDB);
+                }
+
+                if (optionRepository != null) {
+                    OptionDB optionDB = optionRepository.findById(optionId)
+                            .orElseThrow(() -> new RuntimeException("Option not found with id: " + optionId));
+                    newSizeOption.setOptionDB(optionDB);
+                }
+
+                // Save into database
+                SizeOptionDB savedEntity = sizeOptionRepository.save(newSizeOption);
+                System.out.println("Successfully inserted SizeOption with ID: " + savedEntity.getId() +
+                        ", Price: " + savedEntity.getPrice());
+
+                // Create DTO for response
                 SizeOptionDTO sizeDTO = new SizeOptionDTO();
-                sizeDTO.setId(sizeFromRequest.getId());
-                sizeDTO.setPrice(sizeFromRequest.getPrice()); // Take price from request body
+                sizeDTO.setId(sizeId); // **Imp**: use size ID, not SizeOption ID
+                sizeDTO.setPrice(price);
                 sizesList.add(sizeDTO);
             }
 
@@ -605,6 +535,7 @@ public class FoodServiceImpl implements FoodService {
         response.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
         response.setOptions(optionsList);
 
+        System.out.println("Successfully created all SizeOption records");
         return response;
     }
 
