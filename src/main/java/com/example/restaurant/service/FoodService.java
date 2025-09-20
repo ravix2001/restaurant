@@ -3,13 +3,12 @@ package com.example.restaurant.service;
 import com.example.restaurant.dto.*;
 
 import java.util.List;
-import java.util.Map;
 
 public interface FoodService {
 
-    String createMenuAndSize(MenuDTO menuDTO);
+    MenuDTO createMenuAndSize(MenuDTO menuDTO);
 
-    String updateMenuAndSize(MenuDTO menuDTO);
+    MenuDTO updateMenuAndSize(MenuDTO menuDTO);
 
     MenuDTO getMenuWithOptions(Long menuId);
 
