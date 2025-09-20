@@ -22,12 +22,12 @@ public class FoodController {
     private SizeOptionGroupService sizeOptionGroupService;
 
     @PostMapping("/createMenu")
-    public ResponseEntity<String> createMenu(@RequestBody MenuDTO menuDTO) {
+    public ResponseEntity<MenuDTO> createMenu(@RequestBody MenuDTO menuDTO) {
         return new ResponseEntity<>(foodService.createMenuAndSize(menuDTO), HttpStatus.OK);
     }
 
     @PutMapping("/updateMenu")
-    public ResponseEntity<String> updateMenu(@RequestBody MenuDTO menuDTO) {
+    public ResponseEntity<MenuDTO> updateMenu(@RequestBody MenuDTO menuDTO) {
         return new ResponseEntity<>(foodService.updateMenuAndSize(menuDTO), HttpStatus.OK);
     }
 

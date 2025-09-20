@@ -47,68 +47,151 @@ public class FoodServiceImpl implements FoodService {
     private SizeOptionRepository sizeOptionRepository;
 
     @Override
-    public String createMenuAndSize(MenuDTO menuDTO) {
-        //  Create and save the Menu
+    public MenuDTO createMenuAndSize(MenuDTO request) {
+        // Create and save the Menu
         MenuDB menu = new MenuDB();
-        menu.setName(menuDTO.getName());
-        menu.setDescription(menuDTO.getDescription());
-        menu.setBasePrice(menuDTO.getBasePrice());
+        menu.setName(request.getName());
+        menu.setDescription(request.getDescription());
+        menu.setBasePrice(request.getBasePrice());
 
         // Get Category
-        CategoryDB category = categoryRepository.findById(menuDTO.getCategoryId())
+        CategoryDB category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         menu.setCategory(category);
 
         // Get SizeGroup
-        SizeGroupDB sizeGroup = sizeGroupRepository.findById(menuDTO.getSizeGroupId())
+        SizeGroupDB sizeGroup = sizeGroupRepository.findById(request.getSizeGroupId())
                 .orElseThrow(() -> new RuntimeException("SizeGroup not found"));
         menu.setSizeGroup(sizeGroup);
         MenuDB savedMenu = menuRepository.save(menu);
 
-        // find the sizes of the above sizeGroup
+        // Find the sizes of the above sizeGroup
         List<SizeDB> sizes = sizeRepository.findBySizeGroupId(sizeGroup.getId());
 
-        // set the sizes to the respective menu
+        // Set the sizes to the respective menu
         List<MenuSizeDB> menuSizes = new ArrayList<>();
+        List<MenuSizeDTO> menuSizeDTOs = new ArrayList<>();
+
         for (SizeDB sizeDB : sizes) {
             MenuSizeDB menuSizeDB = new MenuSizeDB();
             menuSizeDB.setMenuDB(savedMenu);
             menuSizeDB.setSizeDB(sizeDB);
             menuSizes.add(menuSizeDB);
+
+            // Create corresponding DTO
+            MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
+            menuSizeDTO.setMenuId(savedMenu.getId());
+            menuSizeDTO.setSizeId(sizeDB.getId());
+            menuSizeDTO.setPrice(menuSizeDB.getPrice());
+            menuSizeDTOs.add(menuSizeDTO);
         }
+
         menuSizeRepository.saveAll(menuSizes);
 
-        return "Success";
+        // Build and return MenuDTO
+        MenuDTO response = new MenuDTO();
+        response.setId(savedMenu.getId());
+        response.setName(savedMenu.getName());
+        response.setDescription(savedMenu.getDescription());
+        response.setBasePrice(savedMenu.getBasePrice());
+        response.setCategoryId(savedMenu.getCategory().getId());
+        response.setSizeGroupId(savedMenu.getSizeGroup().getId());
+        response.setMenuSizes(menuSizeDTOs);
+
+        return response;
     }
 
     @Override
-    public String updateMenuAndSize(MenuDTO menuDTO) {
-        MenuDB existingMenu = menuRepository.findById(menuDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Menu not found"));
+    @Transactional
+    public MenuDTO updateMenuAndSize(MenuDTO menuDTO) {
+
+        Long menuId = menuDTO.getId();
+
+        MenuDB existingMenu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new RuntimeException("Menu not found "));
+
+        // Update menu fields
         existingMenu.setName(menuDTO.getName());
+        existingMenu.setDescription(menuDTO.getDescription());
         existingMenu.setBasePrice(menuDTO.getBasePrice());
 
-        CategoryDB existingCategory = categoryRepository.findById(menuDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-        existingMenu.setCategory(existingCategory);
+        // Update Category if changed
+        if (menuDTO.getCategoryId() != null && !menuDTO.getCategoryId().equals(existingMenu.getCategory().getId())) {
+            CategoryDB category = categoryRepository.findById(menuDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            existingMenu.setCategory(category);
+        }
 
-        SizeGroupDB existingSizeGroup = sizeGroupRepository.findById(menuDTO.getSizeGroupId())
-                .orElseThrow(() -> new RuntimeException("SizeGroup not found"));
-        existingMenu.setSizeGroup(existingSizeGroup);
+        // Update SizeGroup if changed
+        SizeGroupDB newSizeGroup = null;
+        boolean sizeGroupChanged = false;
 
-        menuRepository.save(existingMenu);
-
-        List<MenuSizeDB> menuSizeDBList = menuSizeRepository.findByMenuId(existingMenu.getId());
-        for (MenuSizeDTO menuSizeDTO : menuDTO.getMenuSizes()) {
-            for (MenuSizeDB menuSizeDB : menuSizeDBList) {
-                if (menuSizeDB.getId().equals(menuSizeDTO.getId())) {
-                    menuSizeDB.setPrice(menuSizeDTO.getPrice());
-                    menuSizeRepository.save(menuSizeDB);
-                }
+        if (menuDTO.getSizeGroupId() != null) {
+            if (existingMenu.getSizeGroup() == null || !menuDTO.getSizeGroupId().equals(existingMenu.getSizeGroup().getId())) {
+                newSizeGroup = sizeGroupRepository.findById(menuDTO.getSizeGroupId())
+                        .orElseThrow(() -> new RuntimeException("SizeGroup not found"));
+                existingMenu.setSizeGroup(newSizeGroup);
+                sizeGroupChanged = true;
+            } else {
+                newSizeGroup = existingMenu.getSizeGroup();
             }
         }
 
-        return "Success";
+        // Save updated menu
+        MenuDB savedMenu = menuRepository.save(existingMenu);
+
+        // Handle MenuSize updates if SizeGroup changed
+        List<MenuSizeDTO> menuSizeDTOs = new ArrayList<>();
+
+        if (sizeGroupChanged) {
+            // Delete existing MenuSizes
+            List<MenuSizeDB> existingMenuSizes = menuSizeRepository.findByMenuId(menuId);
+            if (!existingMenuSizes.isEmpty()) {
+                menuSizeRepository.deleteAll(existingMenuSizes);
+            }
+
+            // Create new MenuSizes for the new SizeGroup
+            List<SizeDB> sizes = sizeRepository.findBySizeGroupId(newSizeGroup.getId());
+            List<MenuSizeDB> newMenuSizes = new ArrayList<>();
+
+            for (SizeDB sizeDB : sizes) {
+                MenuSizeDB menuSizeDB = new MenuSizeDB();
+                menuSizeDB.setMenuDB(savedMenu);
+                menuSizeDB.setSizeDB(sizeDB);
+                newMenuSizes.add(menuSizeDB);
+
+                // Create corresponding DTO
+                MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
+                menuSizeDTO.setMenuId(savedMenu.getId());
+                menuSizeDTO.setSizeId(sizeDB.getId());
+                menuSizeDTO.setPrice(menuSizeDB.getPrice());
+                menuSizeDTOs.add(menuSizeDTO);
+            }
+
+            menuSizeRepository.saveAll(newMenuSizes);
+        } else {
+            // SizeGroup didn't change, get existing MenuSizes
+            List<SizeDTO> existingSizes = menuSizeRepository.findSizesWithPriceByMenuId(menuId);
+            for (SizeDTO sizeDTO : existingSizes) {
+                MenuSizeDTO menuSizeDTO = new MenuSizeDTO();
+                menuSizeDTO.setMenuId(savedMenu.getId());
+                menuSizeDTO.setSizeId(sizeDTO.getId());
+                menuSizeDTO.setPrice(sizeDTO.getPrice());
+                menuSizeDTOs.add(menuSizeDTO);
+            }
+        }
+
+        // Build and return MenuDTO
+        MenuDTO responseDTO = new MenuDTO();
+        responseDTO.setId(savedMenu.getId());
+        responseDTO.setName(savedMenu.getName());
+        responseDTO.setDescription(savedMenu.getDescription());
+        responseDTO.setBasePrice(savedMenu.getBasePrice());
+        responseDTO.setCategoryId(savedMenu.getCategory().getId());
+        responseDTO.setSizeGroupId(savedMenu.getSizeGroup() != null ? savedMenu.getSizeGroup().getId() : null);
+        responseDTO.setMenuSizes(menuSizeDTOs);
+
+        return responseDTO;
     }
 
     @Override
