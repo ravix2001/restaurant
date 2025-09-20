@@ -12,4 +12,11 @@ public class OptionGroupDTO {
     private Long id;
     private String name;
     private List<OptionDTO> options;
+
+    public OptionGroupDTO() {}
+
+    public OptionGroupDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

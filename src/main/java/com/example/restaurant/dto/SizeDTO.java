@@ -15,4 +15,13 @@ public class SizeDTO {
     private String name;
     private Long sizeGroupId;
     private BigDecimal price;
+
+    public SizeDTO() {}
+
+    public SizeDTO(Long id, String name, BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
 }

@@ -14,6 +14,6 @@ public class SizeGroupOptionGroupDTO {
     private Long sizeGroupOptionGroupId;
     private Long sizeGroupId;
     private Long optionGroupId;
-//    private List<OptionDTO> options;
-    private List<SizeOptionDTO> options;
+    private List<OptionDTO> options;
+//    private List<SizeOptionDTO> options;
 }
