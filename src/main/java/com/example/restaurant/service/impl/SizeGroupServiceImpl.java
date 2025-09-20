@@ -1,11 +1,7 @@
 package com.example.restaurant.service.impl;
 
-import com.example.restaurant.dto.OptionDTO;
-import com.example.restaurant.dto.OptionGroupDTO;
 import com.example.restaurant.dto.SizeDTO;
 import com.example.restaurant.dto.SizeGroupDTO;
-import com.example.restaurant.entity.OptionDB;
-import com.example.restaurant.entity.OptionGroupDB;
 import com.example.restaurant.entity.SizeDB;
 import com.example.restaurant.entity.SizeGroupDB;
 import com.example.restaurant.repository.SizeGroupRepository;

@@ -83,7 +83,7 @@ public class FoodController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/extraPrices")
+    @PutMapping("/extraPrices")
     public ResponseEntity<SizeGroupOptionGroupDTO> handleExtraPrices(@RequestBody SizeGroupOptionGroupDTO request) {
         SizeGroupOptionGroupDTO response = foodService.handleExtraPrices(request);
         return ResponseEntity.ok(response);

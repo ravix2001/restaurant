@@ -233,7 +233,8 @@ public class FoodServiceImpl implements FoodService {
                     optionDTO.setId(optionDB.getId());
                     optionDTO.setName(optionDB.getName());
                     optionDTO.setOptionGroupId(optionDB.getOptionGroupId());
-                    optionDTO.setSelected(true);
+//                    optionDTO.setSelected(true);      // boolean
+                    optionDTO.setIsSelected(true);      // Boolean
                     return optionDTO;
                 })
                 .collect(Collectors.toList());
@@ -292,7 +293,8 @@ public class FoodServiceImpl implements FoodService {
                 }
 
                 // Mark this option as selected
-                optionDTO.setSelected(true);
+//                optionDTO.setSelected(true);      // boolean
+                optionDTO.setIsSelected(true);      // Boolean
             }
         }
 
@@ -306,7 +308,8 @@ public class FoodServiceImpl implements FoodService {
                 System.out.println("Option removed from menu");
 
                 // Mark this option as not selected
-                removedOption.setSelected(false);
+//                removedOption.setSelected(false);
+                removedOption.setIsSelected(false);
             }
         }
 
@@ -318,7 +321,8 @@ public class FoodServiceImpl implements FoodService {
                     optionDTO.setId(optionDB.getId());
                     optionDTO.setName(optionDB.getName());
                     optionDTO.setOptionGroupId(optionDB.getOptionGroupId());
-                    optionDTO.setSelected(true); // These are selected options
+//                    optionDTO.setSelected(true);
+                    optionDTO.setIsSelected(true);
                     return optionDTO;
                 })
                 .collect(Collectors.toList());
@@ -372,7 +376,8 @@ public class FoodServiceImpl implements FoodService {
                     break;
                 }
             }
-            optionDTO.setSelected(isSelected);
+//            optionDTO.setSelected(isSelected);
+            optionDTO.setIsSelected(isSelected);
             optionDTOList.add(optionDTO);
         }
         menuDTO.setMenuOptions(optionDTOList);
@@ -394,14 +399,14 @@ public class FoodServiceImpl implements FoodService {
 
             MenuOptionDB menuOptionDB = menuOptionRepository.findByOptionId(submittedOptionDTO.getId());
 
-            if (menuOptionDB == null && submittedOptionDTO.isSelected()) {
+            if (menuOptionDB == null && submittedOptionDTO.getIsSelected()) {
                 MenuOptionDB newOption = new MenuOptionDB();
                 newOption.setMenuId(menuId);
                 newOption.setMenuDB(menuDB);
                 OptionDB optionDB = optionRepository.findById(submittedOptionDTO.getId()).orElseThrow(() -> new RuntimeException("Option not found"));
                 newOption.setOptionDB(optionDB);
                 menuOptionRepository.save(newOption);
-            } else if (menuOptionDB != null && !submittedOptionDTO.isSelected()) {
+            } else if (menuOptionDB != null && !submittedOptionDTO.getIsSelected()) {
                 menuOptionRepository.delete(menuOptionDB);
             }
         }
@@ -426,17 +431,20 @@ public class FoodServiceImpl implements FoodService {
         List<OptionDB> options = optionRepository.findByOptionGroupId(optionGroupDB.getId());
         List<SizeOptionDB> sizeOptions = sizeOptionRepository.findBySizeGroupOptionGroupId(sizeGroupOptionGroupId);
 
-        // Build response
-        List<SizeOptionDTO> optionsList = new ArrayList<>();
+        // Build response - using OptionDTO instead of SizeOptionDTO
+        List<OptionDTO> optionsList = new ArrayList<>();
 
         for (OptionDB option : options) {
-            SizeOptionDTO optionDTO = new SizeOptionDTO();
+            OptionDTO optionDTO = new OptionDTO();
             optionDTO.setId(option.getId());
+//            optionDTO.setName(option.getName()); // Set the option name
+//            optionDTO.setOptionGroupId(option.getOptionGroupId()); // Set the option group ID
 
             List<SizeOptionDTO> sizesList = new ArrayList<>();
             for (SizeDB size : sizes) {
                 SizeOptionDTO sizeDTO = new SizeOptionDTO();
-                sizeDTO.setId(size.getId());
+//                sizeDTO.setSizeId(size.getId()); // Use setSizeId instead of setId
+//                sizeDTO.setOptionId(option.getId()); // Set the option ID
 
                 // Match price from DB
                 BigDecimal price = sizeOptions.stream()
@@ -447,6 +455,14 @@ public class FoodServiceImpl implements FoodService {
                         .orElse(BigDecimal.ZERO);
 
                 sizeDTO.setPrice(price);
+
+                // Optionally set the SizeOption ID if found
+                sizeOptions.stream()
+                        .filter(so -> so.getSizeDB().getId().equals(size.getId())
+                                && so.getOptionDB().getId().equals(option.getId()))
+                        .findFirst()
+                        .ifPresent(so -> sizeDTO.setId(so.getId()));
+
                 sizesList.add(sizeDTO);
             }
 
@@ -455,7 +471,9 @@ public class FoodServiceImpl implements FoodService {
         }
 
         SizeGroupOptionGroupDTO response = new SizeGroupOptionGroupDTO();
-        response.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+//        response.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+//        response.setSizeGroupId(sizeGroupDB.getId()); // Add size group ID
+//        response.setOptionGroupId(optionGroupDB.getId()); // Add option group ID
         response.setOptions(optionsList);
 
         return response;
@@ -470,60 +488,76 @@ public class FoodServiceImpl implements FoodService {
         SizeGroupOptionGroupDB sizeGroupOptionGroup = sizeGroupOptionGroupRepository.findById(sizeGroupOptionGroupId)
                 .orElseThrow(() -> new RuntimeException("SizeGroupOptionGroup not found"));
 
-        List<SizeOptionDTO> optionsList = new ArrayList<>();
+        List<OptionDTO> optionsList = new ArrayList<>();
 
-        for (SizeOptionDTO optionFromRequest : request.getOptions()) {
-            Long optionId = optionFromRequest.getId(); // This is the Option ID
+        for (OptionDTO optionFromRequest : request.getOptions()) {
+            Long optionId = optionFromRequest.getId();
             System.out.println("Processing option with ID: " + optionId);
 
-            SizeOptionDTO optionDTO = new SizeOptionDTO();
+            OptionDTO optionDTO = new OptionDTO();
             optionDTO.setId(optionId);
+            optionDTO.setName(optionFromRequest.getName());
 
             List<SizeOptionDTO> sizesList = new ArrayList<>();
-            for (SizeOptionDTO sizeFromRequest : optionFromRequest.getSizes()) {
-                Long sizeId = sizeFromRequest.getId(); // This is the Size ID
-                BigDecimal price = sizeFromRequest.getPrice();
 
-                System.out.println("Creating SizeOption: SizeId=" + sizeId +
-                        ", OptionId=" + optionId +
-                        ", Price=" + price +
-                        ", SizeGroupOptionGroupId=" + sizeGroupOptionGroupId);
+            if (optionFromRequest.getSizes() != null) {
+                for (SizeOptionDTO sizeFromRequest : optionFromRequest.getSizes()) {
+                    Long sizeId = sizeFromRequest.getId(); // Using getId() based on your working getExtraPrices
+                    BigDecimal price = sizeFromRequest.getPrice();
 
-                // Create new SizeOptionDB entity
-                SizeOptionDB newSizeOption = new SizeOptionDB();
+                    System.out.println("Processing SizeOption: SizeId=" + sizeId +
+                            ", OptionId=" + optionId +
+                            ", Price=" + price +
+                            ", SizeGroupOptionGroupId=" + sizeGroupOptionGroupId);
 
-                // Set price
-                newSizeOption.setPrice(price);
+                    // Check if SizeOption already exists
+                    Optional<SizeOptionDB> existingSizeOption = sizeOptionRepository
+                            .findBySizeIdAndOptionIdAndSizeGroupOptionGroupId(sizeId, optionId, sizeGroupOptionGroupId);
 
-                newSizeOption.setSizeId(sizeId);
-                newSizeOption.setOptionId(optionId);
-                newSizeOption.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+                    SizeOptionDB sizeOption;
 
-                newSizeOption.setSizeGroupOptionGroupDB(sizeGroupOptionGroup);
+                    if (existingSizeOption.isPresent()) {
+                        // UPDATE existing record
+                        sizeOption = existingSizeOption.get();
+                        sizeOption.setPrice(price); // Update the price
+                        System.out.println("Updating existing SizeOption with ID: " + sizeOption.getId());
+                    } else {
+                        // INSERT new record
+                        sizeOption = new SizeOptionDB();
+                        sizeOption.setPrice(price);
+                        sizeOption.setSizeId(sizeId);
+                        sizeOption.setOptionId(optionId);
+                        sizeOption.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+                        sizeOption.setSizeGroupOptionGroupDB(sizeGroupOptionGroup);
 
-                // Optionally set SizeDB and OptionDB references
-                if (sizeRepository != null) {
-                    SizeDB sizeDB = sizeRepository.findById(sizeId)
-                            .orElseThrow(() -> new RuntimeException("Size not found with id: " + sizeId));
-                    newSizeOption.setSizeDB(sizeDB);
+                        // Set SizeDB and OptionDB references
+                        if (sizeRepository != null) {
+                            SizeDB sizeDB = sizeRepository.findById(sizeId)
+                                    .orElseThrow(() -> new RuntimeException("Size not found with id: " + sizeId));
+                            sizeOption.setSizeDB(sizeDB);
+                        }
+
+                        if (optionRepository != null) {
+                            OptionDB optionDB = optionRepository.findById(optionId)
+                                    .orElseThrow(() -> new RuntimeException("Option not found with id: " + optionId));
+                            sizeOption.setOptionDB(optionDB);
+                        }
+                        System.out.println("Creating new SizeOption record");
+                    }
+
+                    // Save (insert or update)
+                    SizeOptionDB savedEntity = sizeOptionRepository.save(sizeOption);
+                    System.out.println("Successfully saved SizeOption with ID: " + savedEntity.getId() +
+                            ", Price: " + savedEntity.getPrice());
+
+                    // Create DTO for response
+                    SizeOptionDTO sizeDTO = new SizeOptionDTO();
+                    sizeDTO.setPrice(price);
+                    sizeDTO.setId(savedEntity.getId());
+//                    sizeDTO.setSizeId(sizeId); // Use setSizeId()
+//                    sizeDTO.setOptionId(optionId); // Also set optionId
+                    sizesList.add(sizeDTO);
                 }
-
-                if (optionRepository != null) {
-                    OptionDB optionDB = optionRepository.findById(optionId)
-                            .orElseThrow(() -> new RuntimeException("Option not found with id: " + optionId));
-                    newSizeOption.setOptionDB(optionDB);
-                }
-
-                // Save into database
-                SizeOptionDB savedEntity = sizeOptionRepository.save(newSizeOption);
-                System.out.println("Successfully inserted SizeOption with ID: " + savedEntity.getId() +
-                        ", Price: " + savedEntity.getPrice());
-
-                // Create DTO for response
-                SizeOptionDTO sizeDTO = new SizeOptionDTO();
-                sizeDTO.setId(sizeId); // **Imp**: use size ID, not SizeOption ID
-                sizeDTO.setPrice(price);
-                sizesList.add(sizeDTO);
             }
 
             optionDTO.setSizes(sizesList);
@@ -533,9 +567,11 @@ public class FoodServiceImpl implements FoodService {
         // Build response DTO
         SizeGroupOptionGroupDTO response = new SizeGroupOptionGroupDTO();
         response.setSizeGroupOptionGroupId(sizeGroupOptionGroupId);
+//        response.setSizeGroupId(sizeGroupOptionGroup.getSizeGroupId());
+//        response.setOptionGroupId(sizeGroupOptionGroup.getOptionGroupId());
         response.setOptions(optionsList);
 
-        System.out.println("Successfully created all SizeOption records");
+        System.out.println("Successfully processed all SizeOption records");
         return response;
     }
 

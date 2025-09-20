@@ -15,7 +15,20 @@ public class OptionDTO {
     private String name;
     private Long optionId;
     private Long optionGroupId;
-    private List<SizeOptionDTO> sizes;
-    private boolean isSelected;
+    private Boolean isSelected;
     private List<OptionDTO> options;
+    private List<SizeOptionDTO> sizes;      // per size pricing
+
+    public OptionDTO() {}
+
+    public OptionDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public OptionDTO(Long optionId, String name, Long dummy) {
+        this.optionId = optionId;
+        this.name = name;
+    }
+
 }

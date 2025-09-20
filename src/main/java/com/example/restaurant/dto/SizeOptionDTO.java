@@ -16,6 +16,13 @@ public class SizeOptionDTO {
     private BigDecimal price;
     private Long sizeId;
     private Long optionId;
-    private List<SizeOptionDTO> sizes;
+//    private List<SizeOptionDTO> sizes;
+
+    public SizeOptionDTO() {}
+
+    public SizeOptionDTO(Long sizeId, BigDecimal price) {
+        this.id = sizeId;
+        this.price = price;
+    }
 
 }

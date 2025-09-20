@@ -29,5 +29,13 @@ public class MenuDTO {
 
     private List<OptionDTO> removedOptions;
 
+    public MenuDTO() {}
+
+    public MenuDTO(Long id, String name, BigDecimal basePrice) {
+        this.id = id;
+        this.name = name;
+        this.basePrice = basePrice;
+    }
+
 
 }
